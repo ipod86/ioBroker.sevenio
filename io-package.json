@@ -1,0 +1,84 @@
+{
+	"common": {
+		"name": "sevenio",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"uk": "Початкова версія",
+				"zh-cn": "首次出版"
+			}
+		},
+		"titleLang": {
+			"en": "seven.io SMS & Communication",
+			"de": "seven.io SMS & Kommunikation",
+			"ru": "seven.io SMS и связь",
+			"pt": "seven.io SMS e Comunicação",
+			"nl": "seven.io SMS & Communicatie",
+			"fr": "Seven.io SMS et communication",
+			"it": "seven.io SMS e comunicazioni",
+			"es": "Seven.io SMS y comunicación",
+			"pl": "seven.io SMS i komunikacja",
+			"uk": "seven.io SMS та зв'язок",
+			"zh-cn": "seven.io 短信与通讯"
+		},
+		"desc": {
+			"en": "ioBroker adapter for the seven.io API. Send SMS, perform phone number lookups, manage contacts and groups, use voice services and monitor account information.",
+			"de": "ioBroker-Adapter für die seven.io-API. SMS versenden, Telefonnummern abfragen, Kontakte und Gruppen verwalten, Sprachdienste nutzen und Kontoinformationen überwachen.",
+			"ru": "Адаптер ioBroker для API seven.io. Отправка SMS, поиск телефонных номеров, управление контактами и группами, использование голосовых сервисов и мониторинг информации об учетных записях.",
+			"pt": "Adaptador ioBroker para a API seven.io. Envie SMS, realize buscas de números de telefone, gerencie contatos e grupos, utilize serviços de voz e monitore informações da conta.",
+			"nl": "ioBroker-adapter voor de seven.io API. Verstuur sms'jes, zoek telefoonnummers op, beheer contacten en groepen, gebruik spraakdiensten en controleer accountinformatie.",
+			"fr": "Adaptateur ioBroker pour l'API seven.io. Envoyez des SMS, effectuez des recherches de numéros de téléphone, gérez les contacts et les groupes, utilisez les services vocaux et consultez les informations de compte.",
+			"it": "Adattatore ioBroker per l'API di seven.io. Invia SMS, effettua ricerche di numeri di telefono, gestisci contatti e gruppi, utilizza servizi vocali e monitora le informazioni dell'account.",
+			"es": "Adaptador ioBroker para la API de seven.io. Envía SMS, realiza búsquedas de números de teléfono, gestiona contactos y grupos, utiliza servicios de voz y supervisa la información de la cuenta.",
+			"pl": "Adapter ioBroker dla API seven.io. Wysyłaj SMS-y, wyszukuj numery telefonów, zarządzaj kontaktami i grupami, korzystaj z usług głosowych i monitoruj informacje o koncie.",
+			"uk": "Адаптер ioBroker для API seven.io. Надсилайте SMS, виконуйте пошук номерів телефонів, керуйте контактами та групами, користуйтеся голосовими службами та контролюйте інформацію про обліковий запис.",
+			"zh-cn": "ioBroker 是 seven.io API 的适配器。可发送短信、查询电话号码、管理联系人和群组、使用语音服务以及监控帐户信息。"
+		},
+		"authors": ["ipod86 <david@graef.email>"],
+		"keywords": ["seven.io", "sms", "messaging", "voice", "hlr", "mnp", "cnam", "lookup", "communication", "api"],
+		"licenseInformation": {
+			"type": "free",
+			"license": "MIT"
+		},
+		"platform": "Javascript/Node.js",
+		"icon": "sevenio.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/ipod86/ioBroker.sevenio/main/admin/sevenio.png",
+		"readme": "https://github.com/ipod86/ioBroker.sevenio/blob/main/README.md",
+		"loglevel": "info",
+		"tier": 3,
+		"mode": "daemon",
+		"type": "messaging",
+		"compact": true,
+		"connectionType": "cloud",
+		"dataSource": "poll",
+		"adminUI": {
+			"config": "json"
+		},
+		"dependencies": [
+			{
+				"js-controller": ">=6.0.11"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": ">=7.0.23"
+			}
+		]
+	},
+	"native": {
+		"option1": true,
+		"option2": "42"
+	},
+	"objects": [],
+	"instanceObjects": []
+}
