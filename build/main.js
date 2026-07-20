@@ -23,6 +23,38 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var utils = __toESM(require("@iobroker/adapter-core"));
 const API_BASE = "https://gateway.seven.io/api";
+const SMS_STATUS = {
+  100: "Success",
+  101: "Transfer to SMS center failed",
+  201: "Invalid recipient number",
+  202: "Invalid sender ID",
+  301: "Insufficient credits",
+  305: "Invalid scheduled date/time",
+  401: "Illegal endpoint",
+  403: "Sender is blacklisted",
+  500: "Unknown error",
+  600: "Carrier error",
+  700: "Network delivery timeout",
+  900: "Required parameter is empty",
+  901: "Invalid parameter value",
+  902: "Parameter value too long"
+};
+function smsStatusText(result) {
+  var _a;
+  if (typeof result !== "object" || result === null) {
+    return "Unknown status";
+  }
+  const r = result;
+  const raw = r.success;
+  const code = typeof raw === "string" || typeof raw === "number" ? String(raw) : "";
+  return (_a = SMS_STATUS[code]) != null ? _a : `Unknown status ${code}`;
+}
+function enrichSmsResult(result) {
+  if (typeof result !== "object" || result === null) {
+    return result;
+  }
+  return { ...result, statusText: smsStatusText(result) };
+}
 class Sevenio extends utils.Adapter {
   _balanceTimer = null;
   _inboundTimer = null;
@@ -104,8 +136,9 @@ class Sevenio extends utils.Adapter {
       case "send": {
         const msg = obj.message;
         void this.sendSms(msg).then((result) => {
-          this.scheduleDeliveryCheck(this.extractMessageIds(result));
-          respond(result);
+          const enriched = enrichSmsResult(result);
+          this.scheduleDeliveryCheck(this.extractMessageIds(enriched));
+          respond(enriched);
         }).catch((e) => respond({ error: e.message }));
         break;
       }
@@ -266,6 +299,18 @@ class Sevenio extends utils.Adapter {
         name: "Last send result (JSON)",
         type: "string",
         role: "json",
+        read: true,
+        write: false,
+        def: ""
+      },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.lastStatus", {
+      type: "state",
+      common: {
+        name: "Last send status (text)",
+        type: "string",
+        role: "text",
         read: true,
         write: false,
         def: ""
@@ -641,8 +686,9 @@ class Sevenio extends utils.Adapter {
       return;
     }
     try {
-      const result = await this.sendSms(opts);
+      const result = enrichSmsResult(await this.sendSms(opts));
       await this.setState("sms.lastResult", { val: JSON.stringify(result), ack: true });
+      await this.setState("sms.lastStatus", { val: smsStatusText(result), ack: true });
       this.scheduleDeliveryCheck(this.extractMessageIds(result));
     } catch (e) {
       this.log.error(`SMS send failed: ${e.message}`);
