@@ -188,9 +188,20 @@ class Sevenio extends utils.Adapter {
 		switch (obj.command) {
 			case 'send': {
 				const msg = obj.message as SmsOpts;
-				void this.sendSms(msg)
-					.then(result => {
+				const smsOpts: SmsOpts = { ...msg, to: this.resolveRecipient(msg.to) };
+				void this.sendSms(smsOpts)
+					.then(async result => {
 						const enriched = enrichSmsResult(result);
+						await this.setState('sms.to', { val: msg.to, ack: true });
+						await this.setState('sms.text', { val: smsOpts.text, ack: true });
+						if (smsOpts.from !== undefined) {
+							await this.setState('sms.from', { val: smsOpts.from, ack: true });
+						}
+						if (smsOpts.flash !== undefined) {
+							await this.setState('sms.flash', { val: smsOpts.flash, ack: true });
+						}
+						await this.setState('sms.lastResult', { val: JSON.stringify(enriched), ack: true });
+						await this.setState('sms.lastStatus', { val: smsStatusText(enriched), ack: true });
 						this.scheduleDeliveryCheck(this.extractMessageIds(enriched));
 						respond(enriched);
 					})
@@ -200,7 +211,18 @@ class Sevenio extends utils.Adapter {
 			case 'voice': {
 				const msg = obj.message as VoiceOpts;
 				void this.sendVoice(msg)
-					.then(respond)
+					.then(async result => {
+						await this.setState('voice.to', { val: msg.to, ack: true });
+						await this.setState('voice.text', { val: msg.text, ack: true });
+						if (msg.from !== undefined) {
+							await this.setState('voice.from', { val: msg.from, ack: true });
+						}
+						if (msg.ringtime !== undefined) {
+							await this.setState('voice.ringtime', { val: msg.ringtime, ack: true });
+						}
+						await this.setState('voice.lastResult', { val: JSON.stringify(result), ack: true });
+						respond(result);
+					})
 					.catch((e: Error) => respond({ error: e.message }));
 				break;
 			}
