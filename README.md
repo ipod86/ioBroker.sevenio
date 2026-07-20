@@ -6,107 +6,206 @@
 ![Number of Installations](https://iobroker.live/badges/sevenio-installed.svg)
 ![Current version in stable repository](https://iobroker.live/badges/sevenio-stable.svg)
 
-[![NPM](https://nodei.co/npm/iobroker.sevenio.png?downloads=true)](https://nodei.co/npm/iobroker.sevenio/)
-
 **Tests:** ![Test and Release](https://github.com/ipod86/ioBroker.sevenio/workflows/Test%20and%20Release/badge.svg)
 
-## sevenio adapter for ioBroker
+## ioBroker adapter for seven.io
 
-ioBroker adapter for the seven.io API. Send SMS, perform phone number lookups, manage contacts and groups, use voice services and monitor account information.
+This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and communication API. Send SMS messages and trigger text-to-speech voice calls directly from your automations, Blockly scripts, or JavaScript — with contact management, delivery tracking, inbound SMS polling, and account balance monitoring included.
 
-## Developer manual
-This section is intended for the developer. It can be deleted later.
+---
 
-### DISCLAIMER
+## Features
 
-Please make sure that you consider copyrights and trademarks when you use names or logos of a company and add a disclaimer to your README.
-You can check other adapters for examples or ask in the developer community. Using a name or logo of a company without permission may cause legal problems for you.
+- **Send SMS** — trigger via data point, Blockly block, or `sendTo()`
+- **Flash SMS** — message appears directly on the recipient's screen
+- **Voice calls (TTS)** — read any text aloud via an automated call
+- **Delivery status** — automatic check ~60 s after sending, written to a dedicated state
+- **Contact management** — sync contacts from seven.io as individual data points; create new contacts directly from ioBroker
+- **Recipient by name** — enter a contact name instead of a phone number; the adapter resolves it automatically
+- **Account balance polling** — configurable interval, result available as a readable state
+- **Inbound SMS polling** — receive incoming SMS (requires a rented virtual number, see below)
+- **Blockly block** — ready-to-use block in the sendTo category with checkboxes for SMS and/or voice call
+- **`sendTo()` API** — full scripting support for JavaScript adapter
 
-### Getting started
+---
 
-You are almost done, only a few steps left:
-1. Clone the repository from GitHub to a directory on your PC:
-	```bash
-	git clone https://github.com/ipod86/ioBroker.sevenio
-	```
+## Requirements
 
-1. Head over to [src/main.ts](src/main.ts) and start programming!
+- An account at [seven.io](https://www.seven.io)
+- A valid API key (found in your seven.io dashboard under *Developer → API Keys*)
 
-### Best Practices
-We've collected some [best practices](https://github.com/ioBroker/ioBroker.repositories#development-and-coding-best-practices) regarding ioBroker development and coding in general. If you're new to ioBroker or Node.js, you should
-check them out. If you're already experienced, you should also take a look at them - you might learn something new :)
+**Cost model:**
+- Sending SMS and voice calls is **pay-per-use** — you only pay per message or call, no monthly fee
+- **Receiving inbound SMS** requires a virtual phone number rented from seven.io (~€20/month). Without a rented number, inbound polling is not available
 
-### State Roles
-When creating state objects, it is important to use the correct role for the state. The role defines how the state should be interpreted by visualizations and other adapters. For a list of available roles and their meanings, please refer to the [state roles documentation](https://www.iobroker.net/#en/documentation/dev/stateroles.md).
+> **Private users:** seven.io is primarily a business service. When registering, a company name is required. Private users may simply enter their own name or the word *Privat* in that field — seven.io has confirmed this is acceptable.
 
-**Important:** Do not invent your own custom role names. If you need a role that is not part of the official list, please contact the ioBroker developer community for guidance and discussion about adding new roles.
+---
 
-### Scripts in `package.json`
-Several npm scripts are predefined for your convenience. You can run them using `npm run <scriptname>`
-| Script name | Description |
-|-------------|-------------|
-| `build` | Compile the TypeScript sources. |
-| `watch` | Compile the TypeScript sources and watch for changes. |
-| `test:ts` | Executes the tests you defined in `*.test.ts` files. |
-| `test:package` | Ensures your `package.json` and `io-package.json` are valid. |
-| `test:integration` | Tests the adapter startup with an actual instance of ioBroker. |
-| `test` | Performs a minimal test run on package files and your tests. |
-| `check` | Performs a type-check on your code (without compiling anything). |
-| `lint` | Runs `ESLint` to check your code for formatting errors and potential bugs. |
-| `translate` | Translates texts in your adapter to all required languages, see [`@iobroker/adapter-dev`](https://github.com/ioBroker/adapter-dev#manage-translations) for more details. |
-| `release` | Creates a new release, see [`@alcalzone/release-script`](https://github.com/AlCalzone/release-script#usage) for more details. |
+## Configuration
 
-### Configuring the compilation
-The adapter template uses [esbuild](https://esbuild.github.io/) to compile TypeScript and/or React code. You can configure many compilation settings 
-either in `tsconfig.json` or by changing options for the build tasks. These options are described in detail in the
-[`@iobroker/adapter-dev` documentation](https://github.com/ioBroker/adapter-dev#compile-adapter-files).
+| Setting | Description | Default |
+|---|---|---|
+| **API Key** | Your seven.io API key | *(required)* |
+| **Default Sender ID** | Sender name or number shown to recipients (max 11 alphanumeric or 16 numeric characters). Optional — leave empty to use the seven.io account default. | *(empty)* |
+| **Balance polling interval** | How often (in minutes) the adapter polls your account balance | `30` |
+| **Inbound SMS polling interval** | How often (in minutes) the adapter checks for new incoming SMS. Set to `0` to disable inbound polling entirely. | `0` |
 
-### Writing tests
-When done right, testing code is invaluable, because it gives you the 
-confidence to change your code while knowing exactly if and when 
-something breaks. A good read on the topic of test-driven development 
-is https://hackernoon.com/introduction-to-test-driven-development-tdd-61a13bc92d92. 
-Although writing tests before the code might seem strange at first, but it has very 
-clear upsides.
+---
 
-The template provides you with basic tests for the adapter startup and package files.
-It is recommended that you add your own tests into the mix.
+## Data points
 
-### Publishing the adapter
-Using GitHub Actions, you can enable automatic releases on npm whenever you push a new git tag that matches the form 
-`v<major>.<minor>.<patch>`. We **strongly recommend** that you do. The necessary steps are described in `.github/workflows/test-and-release.yml`.
+### `info`
+| State | Type | Description |
+|---|---|---|
+| `info.connection` | boolean | `true` when the adapter can reach the seven.io API |
 
-Since you installed the release script, you can create a new
-release simply by calling:
-```bash
-npm run release
+### `account`
+| State | Type | Description |
+|---|---|---|
+| `account.balance` | number | Current account balance |
+| `account.currency` | string | Currency (e.g. `EUR`) |
+| `account.lastCheck` | string | ISO timestamp of the last balance poll |
+
+### `contacts`
+| State | Type | Description |
+|---|---|---|
+| `contacts.json` | string (JSON) | Full contact list as a JSON array |
+| `contacts.count` | number | Number of contacts |
+| `contacts.refresh` | boolean | Set to `true` to trigger an immediate contact refresh |
+| `contacts.new.name` | string | Name for a new contact to create |
+| `contacts.new.number` | string | Phone number for the new contact (format: `491234567890`, without `+`) |
+| `contacts.new.save` | boolean | Set to `true` to create the contact and refresh the list |
+| `contacts.list.<Name>` | string | One state per contact — the state name is the contact's display name (e.g. `contacts.list.Max_Mustermann`), the value is the phone number |
+
+### `sms`
+| State | Type | R/W | Description |
+|---|---|---|---|
+| `sms.to` | string | rw | Recipient — phone number (`+491234567890`) **or contact name** (e.g. `Max Mustermann`) |
+| `sms.from` | string | rw | Sender ID override — empty = use default from settings |
+| `sms.text` | string | rw | Message text (max 1520 characters / ~10 SMS parts) |
+| `sms.flash` | boolean | rw | Send as flash SMS (message shown directly on screen) |
+| `sms.send` | boolean | rw | Set to `true` to send — resets to `false` automatically |
+| `sms.lastResult` | string (JSON) | r | Full API response of the last send attempt, including `statusText` |
+| `sms.lastStatus` | string | r | Human-readable status of the last send (e.g. `Success`, `Insufficient credits`) |
+| `sms.lastDelivery` | string (JSON) | r | Delivery report fetched ~60 s after sending — contains `id`, `to`, `status` (e.g. `DELIVERED`) |
+
+### `sms.inbound` *(requires virtual number)*
+| State | Type | Description |
+|---|---|---|
+| `sms.inbound.id` | string | Message ID of the last received SMS |
+| `sms.inbound.from` | string | Sender number of the last received SMS |
+| `sms.inbound.text` | string | Text content of the last received SMS |
+| `sms.inbound.timestamp` | string | Timestamp when the SMS was received |
+
+### `voice`
+| State | Type | R/W | Description |
+|---|---|---|---|
+| `voice.to` | string | rw | Recipient phone number |
+| `voice.from` | string | rw | Verified caller number (must be registered in your seven.io account) |
+| `voice.text` | string | rw | Text to read aloud (TTS), max 10 000 characters |
+| `voice.ringtime` | number | rw | How long to ring before hanging up (5–60 seconds, default 30) |
+| `voice.send` | boolean | rw | Set to `true` to start the call — resets to `false` automatically |
+| `voice.lastResult` | string (JSON) | r | Full API response of the last call attempt |
+
+---
+
+## Blockly
+
+After installing the adapter a ready-to-use block appears in the **sendTo** category of the ioBroker Blockly editor.
+
 ```
-Additional command line options for the release script are explained in the
-[release-script documentation](https://github.com/AlCalzone/release-script#command-line).
-
-To get your adapter released in ioBroker, please refer to the documentation 
-of [ioBroker.repositories](https://github.com/ioBroker/ioBroker.repositories#requirements-for-adapter-to-get-added-to-the-latest-repository).
-
-### Test the adapter manually with dev-server
-Please use `dev-server` to test and debug your adapter.
-
-You may install and start `dev-server` by calling from your dev directory:
-```bash
-npm install --global @iobroker/dev-server
-dev-server setup
-dev-server watch
+┌─ seven.io  |  SMS ☑  Voice call ☐ ─────────────┐
+│  recipient   [ "+491234567890"            ]      │
+│  message     [ "Alarm in the living room" ]      │
+│  flash SMS ☐                                     │
+│  ring time (s)  30                               │
+│  instance  sevenio.0 ▼                           │
+└──────────────────────────────────────────────────┘
 ```
 
-Please refer to the [`dev-server` documentation](https://github.com/ioBroker/dev-server#readme) for more details.
+- Check **SMS** to send a text message
+- Check **Voice call** to trigger an automated TTS call
+- Check **both** to send an SMS and make a call at the same time (parallel, no extra delay)
+- The **recipient** input accepts a phone number or a contact name from your seven.io contact list
+
+---
+
+## sendTo() scripting
+
+All functions are available via `sendTo()` in the JavaScript adapter.
+
+**Send an SMS:**
+```javascript
+sendTo('sevenio.0', 'send', {
+    to: '+491234567890',   // or a contact name: 'Max Mustermann'
+    text: 'Door opened!',
+    flash: false,          // optional
+}, result => {
+    console.log(result.statusText); // e.g. 'Success'
+});
+```
+
+**Trigger a voice call:**
+```javascript
+sendTo('sevenio.0', 'voice', {
+    to: '+491234567890',
+    text: 'Attention! Motion detected in the garage.',
+    ringtime: 30,          // optional, 5–60 s
+});
+```
+
+**Get account balance:**
+```javascript
+sendTo('sevenio.0', 'get_balance', {}, result => {
+    console.log(result.amount, result.currency);
+});
+```
+
+**Get contact list:**
+```javascript
+sendTo('sevenio.0', 'get_contacts', {}, contacts => {
+    console.log(JSON.stringify(contacts));
+});
+```
+
+**Create a contact:**
+```javascript
+sendTo('sevenio.0', 'create_contact', {
+    name: 'Max Mustermann',
+    number: '491234567890',   // without +
+});
+```
+
+---
+
+## SMS status codes
+
+The `sms.lastStatus` state contains a human-readable translation of the seven.io status code:
+
+| Code | Meaning |
+|---|---|
+| 100 | Success |
+| 101 | Transfer to SMS center failed |
+| 201 | Invalid recipient number |
+| 202 | Invalid sender ID |
+| 301 | Insufficient credits |
+| 403 | Sender is blacklisted |
+| 500 | Unknown error |
+| 700 | Network delivery timeout |
+
+---
 
 ## Changelog
 <!--
-	Placeholder for the next version (at the beginning of the line):
-	### **WORK IN PROGRESS**
+    Placeholder for the next version (at the beginning of the line):
+    ### **WORK IN PROGRESS**
 -->
 
 ### **WORK IN PROGRESS**
 * (ipod86) initial release
+
+---
 
 ## License
 MIT License
