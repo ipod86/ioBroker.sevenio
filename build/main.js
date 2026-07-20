@@ -26,6 +26,7 @@ const API_BASE = "https://gateway.seven.io/api";
 class Sevenio extends utils.Adapter {
   _balanceTimer = null;
   _inboundTimer = null;
+  _pendingDeliveryTimer = null;
   _lastInboundId = null;
   _stopped = false;
   get cfg() {
@@ -47,6 +48,8 @@ class Sevenio extends utils.Adapter {
     await this.validateConnection();
     this.subscribeStates("sms.send");
     this.subscribeStates("voice.send");
+    this.subscribeStates("contacts.refresh");
+    await this.refreshContacts();
     this.scheduleBalance();
     if (this.cfg.inboundInterval > 0) {
       await this.initInbound();
@@ -63,6 +66,10 @@ class Sevenio extends utils.Adapter {
       this.clearTimeout(this._inboundTimer);
       this._inboundTimer = null;
     }
+    if (this._pendingDeliveryTimer != null) {
+      this.clearTimeout(this._pendingDeliveryTimer);
+      this._pendingDeliveryTimer = null;
+    }
     callback();
   }
   onStateChange(id, state) {
@@ -74,6 +81,9 @@ class Sevenio extends utils.Adapter {
       void this.triggerSms();
     } else if (localId === "voice.send" && state.val === true) {
       void this.triggerVoice();
+    } else if (localId === "contacts.refresh" && state.val === true) {
+      void this.setState("contacts.refresh", { val: false, ack: true });
+      void this.refreshContacts();
     }
   }
   onMessage(obj) {
@@ -88,7 +98,10 @@ class Sevenio extends utils.Adapter {
     switch (obj.command) {
       case "send": {
         const msg = obj.message;
-        void this.sendSms(msg).then(respond).catch((e) => respond({ error: e.message }));
+        void this.sendSms(msg).then((result) => {
+          this.scheduleDeliveryCheck(this.extractMessageIds(result));
+          respond(result);
+        }).catch((e) => respond({ error: e.message }));
         break;
       }
       case "voice": {
@@ -98,6 +111,10 @@ class Sevenio extends utils.Adapter {
       }
       case "get_balance": {
         void this.fetchBalance().then(respond).catch((e) => respond({ error: e.message }));
+        break;
+      }
+      case "get_contacts": {
+        void this.fetchContacts().then(respond).catch((e) => respond({ error: e.message }));
         break;
       }
       default:
@@ -123,6 +140,40 @@ class Sevenio extends utils.Adapter {
     await this.setObjectNotExistsAsync("account.lastCheck", {
       type: "state",
       common: { name: "Last balance check", type: "string", role: "date", read: true, write: false },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts", {
+      type: "channel",
+      common: { name: "Contacts" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts.json", {
+      type: "state",
+      common: {
+        name: "All contacts (JSON)",
+        type: "string",
+        role: "json",
+        read: true,
+        write: false,
+        def: "[]"
+      },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts.count", {
+      type: "state",
+      common: { name: "Number of contacts", type: "number", role: "value", read: true, write: false, def: 0 },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts.refresh", {
+      type: "state",
+      common: {
+        name: "Refresh contacts (set to true to trigger)",
+        type: "boolean",
+        role: "button",
+        read: true,
+        write: true,
+        def: false
+      },
       native: {}
     });
     await this.setObjectNotExistsAsync("sms", {
@@ -173,6 +224,18 @@ class Sevenio extends utils.Adapter {
       type: "state",
       common: {
         name: "Last send result (JSON)",
+        type: "string",
+        role: "json",
+        read: true,
+        write: false,
+        def: ""
+      },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.lastDelivery", {
+      type: "state",
+      common: {
+        name: "Last delivery status (JSON)",
         type: "string",
         role: "json",
         read: true,
@@ -380,6 +443,62 @@ class Sevenio extends utils.Adapter {
     await this.setState("account.lastCheck", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
     return { amount, currency };
   }
+  async fetchContacts() {
+    const res = await this.apiGet("/contacts");
+    if (Array.isArray(res)) {
+      return res;
+    }
+    if (typeof res === "object" && res !== null && "data" in res && Array.isArray(res.data)) {
+      return res.data;
+    }
+    return [];
+  }
+  async refreshContacts() {
+    try {
+      const contacts = await this.fetchContacts();
+      await this.setState("contacts.json", { val: JSON.stringify(contacts), ack: true });
+      await this.setState("contacts.count", { val: contacts.length, ack: true });
+      this.log.debug(`Contacts refreshed: ${contacts.length} entries`);
+    } catch (e) {
+      this.log.warn(`Failed to refresh contacts: ${e.message}`);
+    }
+  }
+  extractMessageIds(result) {
+    if (typeof result !== "object" || result === null) {
+      return [];
+    }
+    const r = result;
+    if (Array.isArray(r.messages)) {
+      return r.messages.map((m) => typeof m.id === "string" || typeof m.id === "number" ? String(m.id) : "").filter((id) => id !== "");
+    }
+    return [];
+  }
+  scheduleDeliveryCheck(messageIds) {
+    if (messageIds.length === 0 || this._stopped) {
+      return;
+    }
+    if (this._pendingDeliveryTimer != null) {
+      this.clearTimeout(this._pendingDeliveryTimer);
+    }
+    this._pendingDeliveryTimer = this.setTimeout(async () => {
+      this._pendingDeliveryTimer = null;
+      if (this._stopped) {
+        return;
+      }
+      try {
+        const res = await this.apiGet("/journal/outbound", { limit: "20" });
+        const entries = Array.isArray(res) ? res : [];
+        const matched = entries.filter((e) => messageIds.includes(e.id));
+        if (matched.length > 0) {
+          const statuses = matched.map((e) => ({ id: e.id, to: e.to, status: e.status }));
+          await this.setState("sms.lastDelivery", { val: JSON.stringify(statuses), ack: true });
+          this.log.debug(`Delivery status: ${JSON.stringify(statuses)}`);
+        }
+      } catch (e) {
+        this.log.warn(`Delivery status check failed: ${e.message}`);
+      }
+    }, 6e4);
+  }
   async triggerSms() {
     var _a, _b, _c, _d;
     await this.setState("sms.send", { val: false, ack: true });
@@ -402,6 +521,7 @@ class Sevenio extends utils.Adapter {
     try {
       const result = await this.sendSms(opts);
       await this.setState("sms.lastResult", { val: JSON.stringify(result), ack: true });
+      this.scheduleDeliveryCheck(this.extractMessageIds(result));
     } catch (e) {
       this.log.error(`SMS send failed: ${e.message}`);
       await this.setState("sms.lastResult", { val: JSON.stringify({ error: e.message }), ack: true });
