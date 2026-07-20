@@ -41,19 +41,20 @@ const SMS_STATUS = {
 };
 function smsStatusText(result) {
   var _a;
-  if (typeof result !== "object" || result === null) {
+  let code;
+  if (typeof result === "number" || typeof result === "string") {
+    code = String(result);
+  } else if (typeof result === "object" && result !== null) {
+    const raw = result.success;
+    code = typeof raw === "string" || typeof raw === "number" ? String(raw) : "";
+  } else {
     return "Unknown status";
   }
-  const r = result;
-  const raw = r.success;
-  const code = typeof raw === "string" || typeof raw === "number" ? String(raw) : "";
   return (_a = SMS_STATUS[code]) != null ? _a : `Unknown status ${code}`;
 }
 function enrichSmsResult(result) {
-  if (typeof result !== "object" || result === null) {
-    return result;
-  }
-  return { ...result, statusText: smsStatusText(result) };
+  const base = typeof result === "object" && result !== null ? { ...result } : { success: result };
+  return { ...base, statusText: smsStatusText(result) };
 }
 class Sevenio extends utils.Adapter {
   _balanceTimer = null;
@@ -658,7 +659,7 @@ class Sevenio extends utils.Adapter {
         const entries = Array.isArray(res) ? res : [];
         const matched = entries.filter((e) => messageIds.includes(e.id));
         if (matched.length > 0) {
-          const statuses = matched.map((e) => ({ id: e.id, to: e.to, status: e.status }));
+          const statuses = matched.map((e) => ({ id: e.id, to: e.to, status: e.dlr }));
           await this.setState("sms.lastDelivery", { val: JSON.stringify(statuses), ack: true });
           this.log.debug(`Delivery status: ${JSON.stringify(statuses)}`);
         }

@@ -32,7 +32,7 @@ interface ContactEntry {
 
 interface OutboundJournalEntry {
 	id: string;
-	status: string;
+	dlr: string;
 	from: string;
 	to: string;
 	text: string;
@@ -60,20 +60,24 @@ const SMS_STATUS: Record<string, string> = {
 };
 
 function smsStatusText(result: unknown): string {
-	if (typeof result !== 'object' || result === null) {
+	let code: string;
+	if (typeof result === 'number' || typeof result === 'string') {
+		code = String(result);
+	} else if (typeof result === 'object' && result !== null) {
+		const raw = (result as Record<string, unknown>).success;
+		code = typeof raw === 'string' || typeof raw === 'number' ? String(raw) : '';
+	} else {
 		return 'Unknown status';
 	}
-	const r = result as Record<string, unknown>;
-	const raw = r.success;
-	const code = typeof raw === 'string' || typeof raw === 'number' ? String(raw) : '';
 	return SMS_STATUS[code] ?? `Unknown status ${code}`;
 }
 
-function enrichSmsResult(result: unknown): unknown {
-	if (typeof result !== 'object' || result === null) {
-		return result;
-	}
-	return { ...(result as Record<string, unknown>), statusText: smsStatusText(result) };
+function enrichSmsResult(result: unknown): Record<string, unknown> {
+	const base: Record<string, unknown> =
+		typeof result === 'object' && result !== null
+			? { ...(result as Record<string, unknown>) }
+			: { success: result };
+	return { ...base, statusText: smsStatusText(result) };
 }
 
 interface SmsOpts {
@@ -764,7 +768,7 @@ class Sevenio extends utils.Adapter {
 				const entries: OutboundJournalEntry[] = Array.isArray(res) ? (res as OutboundJournalEntry[]) : [];
 				const matched = entries.filter(e => messageIds.includes(e.id));
 				if (matched.length > 0) {
-					const statuses = matched.map(e => ({ id: e.id, to: e.to, status: e.status }));
+					const statuses = matched.map(e => ({ id: e.id, to: e.to, status: e.dlr }));
 					await this.setState('sms.lastDelivery', { val: JSON.stringify(statuses), ack: true });
 					this.log.debug(`Delivery status: ${JSON.stringify(statuses)}`);
 				}
