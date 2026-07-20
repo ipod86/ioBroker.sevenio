@@ -200,8 +200,10 @@ class Sevenio extends utils.Adapter {
 						if (smsOpts.flash !== undefined) {
 							await this.setState('sms.flash', { val: smsOpts.flash, ack: true });
 						}
+						const status = smsStatusText(enriched);
+						this.log.info(`SMS to ${msg.to}: ${status}`);
 						await this.setState('sms.lastResult', { val: JSON.stringify(enriched), ack: true });
-						await this.setState('sms.lastStatus', { val: smsStatusText(enriched), ack: true });
+						await this.setState('sms.lastStatus', { val: status, ack: true });
 						this.scheduleDeliveryCheck(this.extractMessageIds(enriched));
 						respond(enriched);
 					})
@@ -220,6 +222,7 @@ class Sevenio extends utils.Adapter {
 						if (msg.ringtime !== undefined) {
 							await this.setState('voice.ringtime', { val: msg.ringtime, ack: true });
 						}
+						this.log.info(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
 						await this.setState('voice.lastResult', { val: JSON.stringify(result), ack: true });
 						respond(result);
 					})
@@ -820,8 +823,10 @@ class Sevenio extends utils.Adapter {
 		}
 		try {
 			const result = enrichSmsResult(await this.sendSms(opts));
+			const status = smsStatusText(result);
+			this.log.info(`SMS to ${opts.to}: ${status}`);
 			await this.setState('sms.lastResult', { val: JSON.stringify(result), ack: true });
-			await this.setState('sms.lastStatus', { val: smsStatusText(result), ack: true });
+			await this.setState('sms.lastStatus', { val: status, ack: true });
 			this.scheduleDeliveryCheck(this.extractMessageIds(result));
 		} catch (e) {
 			this.log.error(`SMS send failed: ${(e as Error).message}`);
@@ -849,6 +854,7 @@ class Sevenio extends utils.Adapter {
 		}
 		try {
 			const result = await this.sendVoice(opts);
+			this.log.info(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
 			await this.setState('voice.lastResult', { val: JSON.stringify(result), ack: true });
 		} catch (e) {
 			this.log.error(`Voice call failed: ${(e as Error).message}`);
