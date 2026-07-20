@@ -283,10 +283,7 @@ class Sevenio extends utils.Adapter {
 				return;
 			}
 			try {
-				const bal = await this.fetchBalance();
-				await this.setState('account.balance', { val: bal.amount, ack: true });
-				await this.setState('account.currency', { val: bal.currency, ack: true });
-				await this.setState('account.lastCheck', { val: new Date().toISOString(), ack: true });
+				await this.fetchBalance();
 			} catch (e) {
 				this.log.warn(`Balance polling failed: ${(e as Error).message}`);
 			}
@@ -296,11 +293,28 @@ class Sevenio extends utils.Adapter {
 
 	private async fetchBalance(): Promise<BalanceResponse> {
 		const res = await this.apiGet('/balance');
-		const data = res as BalanceResponse;
-		await this.setState('account.balance', { val: data.amount, ack: true });
-		await this.setState('account.currency', { val: data.currency, ack: true });
+		this.log.debug(`Balance raw response: ${JSON.stringify(res)}`);
+
+		let amount: number;
+		let currency: string;
+
+		if (typeof res === 'object' && res !== null && 'amount' in res) {
+			amount = (res as BalanceResponse).amount;
+			currency = (res as BalanceResponse).currency ?? 'EUR';
+		} else if (typeof res === 'number') {
+			amount = res;
+			currency = 'EUR';
+		} else if (typeof res === 'string') {
+			amount = parseFloat(res);
+			currency = 'EUR';
+		} else {
+			throw new Error(`Unexpected balance response format: ${JSON.stringify(res)}`);
+		}
+
+		await this.setState('account.balance', { val: amount, ack: true });
+		await this.setState('account.currency', { val: currency, ack: true });
 		await this.setState('account.lastCheck', { val: new Date().toISOString(), ack: true });
-		return data;
+		return { amount, currency };
 	}
 
 	private async triggerSms(): Promise<void> {

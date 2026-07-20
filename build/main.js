@@ -26,6 +26,9 @@ const API_BASE = "https://gateway.seven.io/api";
 class Sevenio extends utils.Adapter {
   _balanceTimer = null;
   _stopped = false;
+  get cfg() {
+    return this.config;
+  }
   constructor(options = {}) {
     super({ ...options, name: "sevenio" });
     this.on("ready", this.onReady.bind(this));
@@ -34,7 +37,7 @@ class Sevenio extends utils.Adapter {
     this.on("unload", this.onUnload.bind(this));
   }
   async onReady() {
-    if (!this.config.apiKey) {
+    if (!this.cfg.apiKey) {
       this.log.error("No API key configured \u2014 please set the API key in the adapter settings");
       return;
     }
@@ -124,7 +127,14 @@ class Sevenio extends utils.Adapter {
     });
     await this.setObjectNotExistsAsync("sms.from", {
       type: "state",
-      common: { name: "Sender ID (empty = default)", type: "string", role: "text", read: true, write: true, def: "" },
+      common: {
+        name: "Sender ID (empty = default)",
+        type: "string",
+        role: "text",
+        read: true,
+        write: true,
+        def: ""
+      },
       native: {}
     });
     await this.setObjectNotExistsAsync("sms.text", {
@@ -139,12 +149,26 @@ class Sevenio extends utils.Adapter {
     });
     await this.setObjectNotExistsAsync("sms.send", {
       type: "state",
-      common: { name: "Send SMS (set to true to trigger)", type: "boolean", role: "button", read: true, write: true, def: false },
+      common: {
+        name: "Send SMS (set to true to trigger)",
+        type: "boolean",
+        role: "button",
+        read: true,
+        write: true,
+        def: false
+      },
       native: {}
     });
     await this.setObjectNotExistsAsync("sms.lastResult", {
       type: "state",
-      common: { name: "Last send result (JSON)", type: "string", role: "json", read: true, write: false, def: "" },
+      common: {
+        name: "Last send result (JSON)",
+        type: "string",
+        role: "json",
+        read: true,
+        write: false,
+        def: ""
+      },
       native: {}
     });
     await this.setObjectNotExistsAsync("voice", {
@@ -164,22 +188,53 @@ class Sevenio extends utils.Adapter {
     });
     await this.setObjectNotExistsAsync("voice.text", {
       type: "state",
-      common: { name: "Text to speak (or TwiML)", type: "string", role: "text", read: true, write: true, def: "" },
+      common: {
+        name: "Text to speak (or TwiML)",
+        type: "string",
+        role: "text",
+        read: true,
+        write: true,
+        def: ""
+      },
       native: {}
     });
     await this.setObjectNotExistsAsync("voice.ringtime", {
       type: "state",
-      common: { name: "Ring time in seconds (5-60)", type: "number", role: "value", read: true, write: true, def: 30, min: 5, max: 60, unit: "s" },
+      common: {
+        name: "Ring time in seconds (5-60)",
+        type: "number",
+        role: "value",
+        read: true,
+        write: true,
+        def: 30,
+        min: 5,
+        max: 60,
+        unit: "s"
+      },
       native: {}
     });
     await this.setObjectNotExistsAsync("voice.send", {
       type: "state",
-      common: { name: "Start call (set to true to trigger)", type: "boolean", role: "button", read: true, write: true, def: false },
+      common: {
+        name: "Start call (set to true to trigger)",
+        type: "boolean",
+        role: "button",
+        read: true,
+        write: true,
+        def: false
+      },
       native: {}
     });
     await this.setObjectNotExistsAsync("voice.lastResult", {
       type: "state",
-      common: { name: "Last call result (JSON)", type: "string", role: "json", read: true, write: false, def: "" },
+      common: {
+        name: "Last call result (JSON)",
+        type: "string",
+        role: "json",
+        read: true,
+        write: false,
+        def: ""
+      },
       native: {}
     });
   }
@@ -198,17 +253,14 @@ class Sevenio extends utils.Adapter {
     if (this._stopped) {
       return;
     }
-    const intervalMs = Math.max(1, (_a = this.config.balanceInterval) != null ? _a : 30) * 6e4;
+    const intervalMs = Math.max(1, (_a = this.cfg.balanceInterval) != null ? _a : 30) * 6e4;
     this._balanceTimer = this.setTimeout(async () => {
       this._balanceTimer = null;
       if (this._stopped) {
         return;
       }
       try {
-        const bal = await this.fetchBalance();
-        await this.setState("account.balance", { val: bal.amount, ack: true });
-        await this.setState("account.currency", { val: bal.currency, ack: true });
-        await this.setState("account.lastCheck", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
+        await this.fetchBalance();
       } catch (e) {
         this.log.warn(`Balance polling failed: ${e.message}`);
       }
@@ -216,12 +268,27 @@ class Sevenio extends utils.Adapter {
     }, intervalMs);
   }
   async fetchBalance() {
+    var _a;
     const res = await this.apiGet("/balance");
-    const data = res;
-    await this.setState("account.balance", { val: data.amount, ack: true });
-    await this.setState("account.currency", { val: data.currency, ack: true });
+    this.log.debug(`Balance raw response: ${JSON.stringify(res)}`);
+    let amount;
+    let currency;
+    if (typeof res === "object" && res !== null && "amount" in res) {
+      amount = res.amount;
+      currency = (_a = res.currency) != null ? _a : "EUR";
+    } else if (typeof res === "number") {
+      amount = res;
+      currency = "EUR";
+    } else if (typeof res === "string") {
+      amount = parseFloat(res);
+      currency = "EUR";
+    } else {
+      throw new Error(`Unexpected balance response format: ${JSON.stringify(res)}`);
+    }
+    await this.setState("account.balance", { val: amount, ack: true });
+    await this.setState("account.currency", { val: currency, ack: true });
     await this.setState("account.lastCheck", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
-    return data;
+    return { amount, currency };
   }
   async triggerSms() {
     var _a, _b, _c, _d;
@@ -274,7 +341,10 @@ class Sevenio extends utils.Adapter {
       await this.setState("voice.lastResult", { val: JSON.stringify(result), ack: true });
     } catch (e) {
       this.log.error(`Voice call failed: ${e.message}`);
-      await this.setState("voice.lastResult", { val: JSON.stringify({ error: e.message }), ack: true });
+      await this.setState("voice.lastResult", {
+        val: JSON.stringify({ error: e.message }),
+        ack: true
+      });
     }
   }
   async sendSms(opts) {
@@ -284,7 +354,7 @@ class Sevenio extends utils.Adapter {
     const body = {
       to: opts.to,
       text: opts.text,
-      from: opts.from || this.config.defaultSender || ""
+      from: opts.from || this.cfg.defaultSender || ""
     };
     if (opts.flash) {
       body.flash = "1";
@@ -314,7 +384,7 @@ class Sevenio extends utils.Adapter {
   }
   async apiGet(path) {
     const res = await fetch(`${API_BASE}${path}`, {
-      headers: { "X-Api-Key": this.config.apiKey },
+      headers: { "X-Api-Key": this.cfg.apiKey },
       signal: AbortSignal.timeout(3e4)
     });
     if (!res.ok) {
@@ -326,7 +396,7 @@ class Sevenio extends utils.Adapter {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: {
-        "X-Api-Key": this.config.apiKey,
+        "X-Api-Key": this.cfg.apiKey,
         "Content-Type": "application/x-www-form-urlencoded"
       },
       body: new URLSearchParams(body).toString(),
