@@ -72,6 +72,17 @@ function smsStatusText(result: unknown): string {
 	return SMS_STATUS[code] ?? `Unknown status ${code}`;
 }
 
+function smsIsSuccess(result: unknown): boolean {
+	if (typeof result === 'number' || typeof result === 'string') {
+		return String(result) === '100';
+	}
+	if (typeof result === 'object' && result !== null) {
+		const raw = (result as Record<string, unknown>).success;
+		return String(raw) === '100';
+	}
+	return false;
+}
+
 function enrichSmsResult(result: unknown): Record<string, unknown> {
 	const base: Record<string, unknown> =
 		typeof result === 'object' && result !== null
@@ -201,7 +212,11 @@ class Sevenio extends utils.Adapter {
 							await this.setState('sms.flash', { val: smsOpts.flash, ack: true });
 						}
 						const status = smsStatusText(enriched);
-						this.log.info(`SMS to ${msg.to}: ${status}`);
+						if (smsIsSuccess(enriched)) {
+							this.log.debug(`SMS to ${msg.to}: ${status}`);
+						} else {
+							this.log.info(`SMS to ${msg.to}: ${status}`);
+						}
 						await this.setState('sms.lastResult', { val: JSON.stringify(enriched), ack: true });
 						await this.setState('sms.lastStatus', { val: status, ack: true });
 						this.scheduleDeliveryCheck(this.extractMessageIds(enriched));
@@ -222,7 +237,7 @@ class Sevenio extends utils.Adapter {
 						if (msg.ringtime !== undefined) {
 							await this.setState('voice.ringtime', { val: msg.ringtime, ack: true });
 						}
-						this.log.info(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
+						this.log.debug(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
 						await this.setState('voice.lastResult', { val: JSON.stringify(result), ack: true });
 						respond(result);
 					})
@@ -824,7 +839,11 @@ class Sevenio extends utils.Adapter {
 		try {
 			const result = enrichSmsResult(await this.sendSms(opts));
 			const status = smsStatusText(result);
-			this.log.info(`SMS to ${opts.to}: ${status}`);
+			if (smsIsSuccess(result)) {
+				this.log.debug(`SMS to ${opts.to}: ${status}`);
+			} else {
+				this.log.info(`SMS to ${opts.to}: ${status}`);
+			}
 			await this.setState('sms.lastResult', { val: JSON.stringify(result), ack: true });
 			await this.setState('sms.lastStatus', { val: status, ack: true });
 			this.scheduleDeliveryCheck(this.extractMessageIds(result));
@@ -854,7 +873,7 @@ class Sevenio extends utils.Adapter {
 		}
 		try {
 			const result = await this.sendVoice(opts);
-			this.log.info(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
+			this.log.debug(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
 			await this.setState('voice.lastResult', { val: JSON.stringify(result), ack: true });
 		} catch (e) {
 			this.log.error(`Voice call failed: ${(e as Error).message}`);
