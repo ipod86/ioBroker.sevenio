@@ -52,6 +52,16 @@ function smsStatusText(result) {
   }
   return (_a = SMS_STATUS[code]) != null ? _a : `Unknown status ${code}`;
 }
+function voiceIsSuccess(result) {
+  if (typeof result === "object" && result !== null) {
+    const r = result;
+    if ("success" in r) {
+      const s = r.success;
+      return s === true || s === 1 || s === "1";
+    }
+  }
+  return true;
+}
 function smsIsSuccess(result) {
   if (typeof result === "number" || typeof result === "string") {
     return String(result) === "100";
@@ -181,7 +191,11 @@ class Sevenio extends utils.Adapter {
           if (msg.ringtime !== void 0) {
             await this.setState("voice.ringtime", { val: msg.ringtime, ack: true });
           }
-          this.log.debug(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
+          if (voiceIsSuccess(result)) {
+            this.log.debug(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
+          } else {
+            this.log.info(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
+          }
           await this.setState("voice.lastResult", { val: JSON.stringify(result), ack: true });
           respond(result);
         }).catch((e) => respond({ error: e.message }));
@@ -763,7 +777,11 @@ class Sevenio extends utils.Adapter {
     }
     try {
       const result = await this.sendVoice(opts);
-      this.log.debug(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
+      if (voiceIsSuccess(result)) {
+        this.log.debug(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
+      } else {
+        this.log.info(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
+      }
       await this.setState("voice.lastResult", { val: JSON.stringify(result), ack: true });
     } catch (e) {
       this.log.error(`Voice call failed: ${e.message}`);
