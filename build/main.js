@@ -50,6 +50,7 @@ class Sevenio extends utils.Adapter {
     this.subscribeStates("sms.send");
     this.subscribeStates("voice.send");
     this.subscribeStates("contacts.refresh");
+    this.subscribeStates("contacts.new.save");
     await this.refreshContacts();
     this.scheduleBalance();
     if (this.cfg.inboundInterval > 0) {
@@ -85,6 +86,9 @@ class Sevenio extends utils.Adapter {
     } else if (localId === "contacts.refresh" && state.val === true) {
       void this.setState("contacts.refresh", { val: false, ack: true });
       void this.refreshContacts();
+    } else if (localId === "contacts.new.save" && state.val === true) {
+      void this.setState("contacts.new.save", { val: false, ack: true });
+      void this.triggerCreateContact();
     }
   }
   onMessage(obj) {
@@ -177,6 +181,33 @@ class Sevenio extends utils.Adapter {
       type: "state",
       common: {
         name: "Refresh contacts (set to true to trigger)",
+        type: "boolean",
+        role: "button",
+        read: true,
+        write: true,
+        def: false
+      },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts.new", {
+      type: "channel",
+      common: { name: "New contact" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts.new.name", {
+      type: "state",
+      common: { name: "Name", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts.new.number", {
+      type: "state",
+      common: { name: "Phone number", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("contacts.new.save", {
+      type: "state",
+      common: {
+        name: "Save contact (set to true to create)",
         type: "boolean",
         role: "button",
         read: true,
@@ -468,15 +499,15 @@ class Sevenio extends utils.Adapter {
       this._contacts = contacts;
       await this.setState("contacts.json", { val: JSON.stringify(contacts), ack: true });
       await this.setState("contacts.count", { val: contacts.length, ack: true });
-      const newIds = new Set(contacts.map((c) => String(c.id)));
+      const newKeys = new Set(contacts.map((c) => this.sanitizeName(c.name || c.nick)));
       const existingObjs = await this.getObjectViewAsync("system", "state", {
         startkey: `${this.namespace}.contacts.list.`,
         endkey: `${this.namespace}.contacts.list.\u9999`
       });
       for (const row of existingObjs.rows) {
         const shortId = row.id.replace(`${this.namespace}.`, "");
-        const contactId = shortId.replace("contacts.list.", "");
-        if (!newIds.has(contactId)) {
+        const key = shortId.replace("contacts.list.", "");
+        if (!newKeys.has(key)) {
           await this.delObjectAsync(shortId);
         }
       }
@@ -486,7 +517,7 @@ class Sevenio extends utils.Adapter {
         native: {}
       });
       for (const c of contacts) {
-        const stateId = `contacts.list.${c.id}`;
+        const stateId = `contacts.list.${this.sanitizeName(c.name || c.nick)}`;
         await this.extendObjectAsync(stateId, {
           type: "state",
           common: {
@@ -504,6 +535,31 @@ class Sevenio extends utils.Adapter {
     } catch (e) {
       this.log.warn(`Failed to refresh contacts: ${e.message}`);
     }
+  }
+  async triggerCreateContact() {
+    var _a, _b;
+    const [nameState, numberState] = await Promise.all([
+      this.getStateAsync("contacts.new.name"),
+      this.getStateAsync("contacts.new.number")
+    ]);
+    const name = String((_a = nameState == null ? void 0 : nameState.val) != null ? _a : "").trim();
+    const number = String((_b = numberState == null ? void 0 : numberState.val) != null ? _b : "").trim();
+    if (!name || !number) {
+      this.log.warn("Create contact: name and number must not be empty");
+      return;
+    }
+    try {
+      await this.apiPost("/contacts", { nick: name, number });
+      await this.setState("contacts.new.name", { val: "", ack: true });
+      await this.setState("contacts.new.number", { val: "", ack: true });
+      await this.refreshContacts();
+      this.log.info(`Contact "${name}" created`);
+    } catch (e) {
+      this.log.error(`Create contact failed: ${e.message}`);
+    }
+  }
+  sanitizeName(name) {
+    return name.trim().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss").replace(/[^a-zA-Z0-9]/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "") || "contact";
   }
   resolveRecipient(to) {
     const trimmed = to.trim();
