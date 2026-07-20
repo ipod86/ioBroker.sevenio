@@ -79,7 +79,8 @@
 	"native": {
 		"apiKey": "",
 		"defaultSender": "",
-		"balanceInterval": 30
+		"balanceInterval": 30,
+		"inboundInterval": 0
 	},
 	"objects": [],
 	"instanceObjects": [

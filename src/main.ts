@@ -4,6 +4,16 @@ interface SevenioConfig extends ioBroker.AdapterConfig {
 	apiKey: string;
 	defaultSender: string;
 	balanceInterval: number;
+	inboundInterval: number;
+}
+
+interface InboundMessage {
+	id: string;
+	from: string;
+	to: string;
+	text: string;
+	timestamp: string;
+	price: string;
 }
 
 const API_BASE = 'https://gateway.seven.io/api';
@@ -30,6 +40,8 @@ interface BalanceResponse {
 
 class Sevenio extends utils.Adapter {
 	private _balanceTimer: ioBroker.Timeout | null | undefined = null;
+	private _inboundTimer: ioBroker.Timeout | null | undefined = null;
+	private _lastInboundId: string | null = null;
 	private _stopped = false;
 
 	private get cfg(): SevenioConfig {
@@ -55,6 +67,10 @@ class Sevenio extends utils.Adapter {
 		this.subscribeStates('sms.send');
 		this.subscribeStates('voice.send');
 		this.scheduleBalance();
+		if (this.cfg.inboundInterval > 0) {
+			await this.initInbound();
+			this.scheduleInbound();
+		}
 	}
 
 	private onUnload(callback: () => void): void {
@@ -62,6 +78,10 @@ class Sevenio extends utils.Adapter {
 		if (this._balanceTimer != null) {
 			this.clearTimeout(this._balanceTimer);
 			this._balanceTimer = null;
+		}
+		if (this._inboundTimer != null) {
+			this.clearTimeout(this._inboundTimer);
+			this._inboundTimer = null;
 		}
 		callback();
 	}
@@ -193,6 +213,32 @@ class Sevenio extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync('sms.inbound', {
+			type: 'channel',
+			common: { name: 'Last received SMS' },
+			native: {},
+		});
+		await this.setObjectNotExistsAsync('sms.inbound.id', {
+			type: 'state',
+			common: { name: 'Message ID', type: 'string', role: 'text', read: true, write: false, def: '' },
+			native: {},
+		});
+		await this.setObjectNotExistsAsync('sms.inbound.from', {
+			type: 'state',
+			common: { name: 'Sender number', type: 'string', role: 'text', read: true, write: false, def: '' },
+			native: {},
+		});
+		await this.setObjectNotExistsAsync('sms.inbound.text', {
+			type: 'state',
+			common: { name: 'Message text', type: 'string', role: 'text', read: true, write: false, def: '' },
+			native: {},
+		});
+		await this.setObjectNotExistsAsync('sms.inbound.timestamp', {
+			type: 'state',
+			common: { name: 'Received at', type: 'string', role: 'date', read: true, write: false, def: '' },
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync('voice', {
 			type: 'channel',
 			common: { name: 'Voice' },
@@ -289,6 +335,66 @@ class Sevenio extends utils.Adapter {
 			}
 			this.scheduleBalance();
 		}, intervalMs);
+	}
+
+	private async initInbound(): Promise<void> {
+		const saved = await this.getStateAsync('sms.inbound.id');
+		if (saved?.val) {
+			this._lastInboundId = String(saved.val);
+			this.log.debug(`Inbound polling: resuming after message id ${this._lastInboundId}`);
+			return;
+		}
+		const messages = await this.fetchInboundMessages();
+		if (messages.length > 0) {
+			this._lastInboundId = messages[0].id;
+			this.log.debug(`Inbound polling: initialized at latest id ${this._lastInboundId}`);
+		}
+	}
+
+	private scheduleInbound(): void {
+		if (this._stopped) {
+			return;
+		}
+		const intervalMs = Math.max(1, this.cfg.inboundInterval) * 60_000;
+		this._inboundTimer = this.setTimeout(async () => {
+			this._inboundTimer = null;
+			if (this._stopped) {
+				return;
+			}
+			try {
+				await this.pollInbound();
+			} catch (e) {
+				this.log.warn(`Inbound polling failed: ${(e as Error).message}`);
+			}
+			this.scheduleInbound();
+		}, intervalMs);
+	}
+
+	private async pollInbound(): Promise<void> {
+		const messages = await this.fetchInboundMessages();
+		if (messages.length === 0) {
+			return;
+		}
+		const newMessages = this._lastInboundId ? messages.filter(m => m.id > this._lastInboundId!) : messages;
+
+		if (newMessages.length === 0) {
+			return;
+		}
+		this.log.info(`${newMessages.length} new inbound SMS received`);
+		const latest = newMessages[0];
+		this._lastInboundId = latest.id;
+		await this.setState('sms.inbound.id', { val: latest.id, ack: true });
+		await this.setState('sms.inbound.from', { val: latest.from, ack: true });
+		await this.setState('sms.inbound.text', { val: latest.text, ack: true });
+		await this.setState('sms.inbound.timestamp', { val: latest.timestamp, ack: true });
+	}
+
+	private async fetchInboundMessages(): Promise<InboundMessage[]> {
+		const res = await this.apiGet('/journal/inbound', { limit: '50' });
+		if (!Array.isArray(res)) {
+			return [];
+		}
+		return res as InboundMessage[];
 	}
 
 	private async fetchBalance(): Promise<BalanceResponse> {
@@ -410,8 +516,14 @@ class Sevenio extends utils.Adapter {
 		return this.apiPost('/voice', body);
 	}
 
-	private async apiGet(path: string): Promise<unknown> {
-		const res = await fetch(`${API_BASE}${path}`, {
+	private async apiGet(path: string, params?: Record<string, string>): Promise<unknown> {
+		const url = new URL(`${API_BASE}${path}`);
+		if (params) {
+			for (const [k, v] of Object.entries(params)) {
+				url.searchParams.set(k, v);
+			}
+		}
+		const res = await fetch(url.toString(), {
 			headers: { 'X-Api-Key': this.cfg.apiKey },
 			signal: AbortSignal.timeout(30_000),
 		});

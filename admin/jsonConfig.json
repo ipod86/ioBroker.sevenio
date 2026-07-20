@@ -33,6 +33,19 @@
 			"md": 6,
 			"lg": 4,
 			"xl": 4
+		},
+		"inboundInterval": {
+			"type": "number",
+			"label": "inboundInterval",
+			"help": "inboundIntervalHelp",
+			"newLine": true,
+			"min": 0,
+			"max": 1440,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
 		}
 	}
 }
