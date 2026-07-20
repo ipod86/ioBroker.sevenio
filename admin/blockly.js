@@ -99,24 +99,52 @@ Blockly.Words['sevenio_help'] = {
 };
 
 // --- Build contact list from adapter states ----------------------
+var _sevenioContactNames = [];
+
+(function () {
+    var CONTACT_RE = /^sevenio\.\d+\.contacts\.list\.([^.]+)$/;
+
+    function extract(source) {
+        var ids = Array.isArray(source)
+            ? source.map(function (r) { return r.id || r._id || ''; })
+            : Object.keys(source || {});
+        var found = [];
+        ids.forEach(function (id) {
+            var m = id.match(CONTACT_RE);
+            if (m) found.push(m[1].replace(/_/g, ' '));
+        });
+        if (found.length) _sevenioContactNames = found.sort();
+    }
+
+    // Classic admin: main.objects is already loaded
+    if (typeof main !== 'undefined' && main && main.objects) {
+        extract(main.objects);
+    }
+
+    // New admin / fallback: ask the socket directly
+    if (!_sevenioContactNames.length) {
+        try {
+            var sock = (typeof socket !== 'undefined' && socket) ||
+                       (typeof window !== 'undefined' && window.socket);
+            if (sock && sock.emit) {
+                sock.emit(
+                    'getObjectView', 'system', 'state',
+                    { startkey: 'sevenio.', endkey: 'sevenio.香' },
+                    function (err, res) {
+                        if (!err && res) extract(res.rows || res);
+                    }
+                );
+            }
+        } catch (e) { /* ignore */ }
+    }
+})();
+
 function _sevenioContactOptions() {
-    const opts = [[Blockly.Translate('sevenio_contact_ph'), '']];
-    if (typeof main !== 'undefined' && main.objects) {
-        Object.keys(main.objects)
-            .filter(function (id) {
-                return /^sevenio\.\d+\.contacts\.list\.[^.]+$/.test(id);
-            })
-            .sort()
-            .forEach(function (id) {
-                const key = id.replace(/^sevenio\.\d+\.contacts\.list\./, '');
-                const label = key.replace(/_/g, ' ');
-                opts.push([label, label]);
-            });
-    }
-    // Always provide a second option so Blockly doesn't collapse a single-item dropdown
-    if (opts.length === 1) {
-        opts.push(['(no contacts)', '']);
-    }
+    var opts = [[Blockly.Translate('sevenio_contact_ph'), '']];
+    _sevenioContactNames.forEach(function (name) {
+        opts.push([name, name]);
+    });
+    if (opts.length === 1) opts.push(['(no contacts)', '']);
     return opts;
 }
 
