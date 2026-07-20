@@ -672,11 +672,14 @@ class Sevenio extends utils.Adapter {
 			this.getStateAsync('contacts.new.number'),
 		]);
 		const name = String(nameState?.val ?? '').trim();
-		const number = String(numberState?.val ?? '').trim();
+		const number = String(numberState?.val ?? '')
+			.trim()
+			.replace(/^\+/, '');
 		if (!name || !number) {
 			this.log.warn('Create contact: name and number must not be empty');
 			return;
 		}
+		this.log.debug(`Creating contact: firstname="${name}", mobile_number="${number}"`);
 		try {
 			await this.apiPost('/contacts', { firstname: name, mobile_number: number });
 			await this.setState('contacts.new.name', { val: '', ack: true });
@@ -894,7 +897,8 @@ class Sevenio extends utils.Adapter {
 			signal: AbortSignal.timeout(30_000),
 		});
 		if (!res.ok) {
-			throw new Error(`HTTP ${res.status} ${res.statusText}`);
+			const body = await res.text().catch(() => '');
+			throw new Error(`HTTP ${res.status} ${res.statusText}${body ? ` — ${body}` : ''}`);
 		}
 		return res.json();
 	}
