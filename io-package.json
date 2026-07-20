@@ -59,6 +59,7 @@
 		"mode": "daemon",
 		"type": "messaging",
 		"messagebox": true,
+		"blockly": true,
 		"compact": true,
 		"connectionType": "cloud",
 		"dataSource": "poll",
