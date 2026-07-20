@@ -28,6 +28,7 @@ class Sevenio extends utils.Adapter {
   _inboundTimer = null;
   _pendingDeliveryTimer = null;
   _lastInboundId = null;
+  _contacts = [];
   _stopped = false;
   get cfg() {
     return this.config;
@@ -115,6 +116,14 @@ class Sevenio extends utils.Adapter {
       }
       case "get_contacts": {
         void this.fetchContacts().then(respond).catch((e) => respond({ error: e.message }));
+        break;
+      }
+      case "create_contact": {
+        const { name, number } = obj.message;
+        void this.apiPost("/contacts", { nick: name, number }).then(async (result) => {
+          await this.refreshContacts();
+          respond(result);
+        }).catch((e) => respond({ error: e.message }));
         break;
       }
       default:
@@ -456,12 +465,59 @@ class Sevenio extends utils.Adapter {
   async refreshContacts() {
     try {
       const contacts = await this.fetchContacts();
+      this._contacts = contacts;
       await this.setState("contacts.json", { val: JSON.stringify(contacts), ack: true });
       await this.setState("contacts.count", { val: contacts.length, ack: true });
+      const newIds = new Set(contacts.map((c) => String(c.id)));
+      const existingObjs = await this.getObjectViewAsync("system", "state", {
+        startkey: `${this.namespace}.contacts.list.`,
+        endkey: `${this.namespace}.contacts.list.\u9999`
+      });
+      for (const row of existingObjs.rows) {
+        const shortId = row.id.replace(`${this.namespace}.`, "");
+        const contactId = shortId.replace("contacts.list.", "");
+        if (!newIds.has(contactId)) {
+          await this.delObjectAsync(shortId);
+        }
+      }
+      await this.setObjectNotExistsAsync("contacts.list", {
+        type: "channel",
+        common: { name: "Contact list" },
+        native: {}
+      });
+      for (const c of contacts) {
+        const stateId = `contacts.list.${c.id}`;
+        await this.extendObjectAsync(stateId, {
+          type: "state",
+          common: {
+            name: c.name || c.nick,
+            type: "string",
+            role: "text",
+            read: true,
+            write: false
+          },
+          native: {}
+        });
+        await this.setState(stateId, { val: c.number, ack: true });
+      }
       this.log.debug(`Contacts refreshed: ${contacts.length} entries`);
     } catch (e) {
       this.log.warn(`Failed to refresh contacts: ${e.message}`);
     }
+  }
+  resolveRecipient(to) {
+    const trimmed = to.trim();
+    if (/^[+\d]/.test(trimmed)) {
+      return trimmed;
+    }
+    const lower = trimmed.toLowerCase();
+    const match = this._contacts.find((c) => c.name.toLowerCase() === lower || c.nick.toLowerCase() === lower);
+    if (match) {
+      this.log.debug(`Resolved contact "${trimmed}" \u2192 ${match.number}`);
+      return match.number;
+    }
+    this.log.warn(`Contact "${trimmed}" not found, using value as-is`);
+    return trimmed;
   }
   extractMessageIds(result) {
     if (typeof result !== "object" || result === null) {
@@ -509,7 +565,7 @@ class Sevenio extends utils.Adapter {
       this.getStateAsync("sms.flash")
     ]);
     const opts = {
-      to: String((_a = to == null ? void 0 : to.val) != null ? _a : ""),
+      to: this.resolveRecipient(String((_a = to == null ? void 0 : to.val) != null ? _a : "")),
       text: String((_b = text == null ? void 0 : text.val) != null ? _b : ""),
       from: String((_c = from == null ? void 0 : from.val) != null ? _c : ""),
       flash: Boolean((_d = flash == null ? void 0 : flash.val) != null ? _d : false)

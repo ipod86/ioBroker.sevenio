@@ -60,6 +60,7 @@ class Sevenio extends utils.Adapter {
 	private _inboundTimer: ioBroker.Timeout | null | undefined = null;
 	private _pendingDeliveryTimer: ioBroker.Timeout | null | undefined = null;
 	private _lastInboundId: string | null = null;
+	private _contacts: ContactEntry[] = [];
 	private _stopped = false;
 
 	private get cfg(): SevenioConfig {
@@ -162,6 +163,16 @@ class Sevenio extends utils.Adapter {
 			case 'get_contacts': {
 				void this.fetchContacts()
 					.then(respond)
+					.catch((e: Error) => respond({ error: e.message }));
+				break;
+			}
+			case 'create_contact': {
+				const { name, number } = obj.message as { name: string; number: string };
+				void this.apiPost('/contacts', { nick: name, number })
+					.then(async result => {
+						await this.refreshContacts();
+						respond(result);
+					})
 					.catch((e: Error) => respond({ error: e.message }));
 				break;
 			}
@@ -525,12 +536,63 @@ class Sevenio extends utils.Adapter {
 	private async refreshContacts(): Promise<void> {
 		try {
 			const contacts = await this.fetchContacts();
+			this._contacts = contacts;
 			await this.setState('contacts.json', { val: JSON.stringify(contacts), ack: true });
 			await this.setState('contacts.count', { val: contacts.length, ack: true });
+
+			const newIds = new Set(contacts.map(c => String(c.id)));
+			const existingObjs = await this.getObjectViewAsync('system', 'state', {
+				startkey: `${this.namespace}.contacts.list.`,
+				endkey: `${this.namespace}.contacts.list.香`,
+			});
+			for (const row of existingObjs.rows) {
+				const shortId = row.id.replace(`${this.namespace}.`, '');
+				const contactId = shortId.replace('contacts.list.', '');
+				if (!newIds.has(contactId)) {
+					await this.delObjectAsync(shortId);
+				}
+			}
+
+			await this.setObjectNotExistsAsync('contacts.list', {
+				type: 'channel',
+				common: { name: 'Contact list' },
+				native: {},
+			});
+			for (const c of contacts) {
+				const stateId = `contacts.list.${c.id}`;
+				await this.extendObjectAsync(stateId, {
+					type: 'state',
+					common: {
+						name: c.name || c.nick,
+						type: 'string',
+						role: 'text',
+						read: true,
+						write: false,
+					},
+					native: {},
+				});
+				await this.setState(stateId, { val: c.number, ack: true });
+			}
+
 			this.log.debug(`Contacts refreshed: ${contacts.length} entries`);
 		} catch (e) {
 			this.log.warn(`Failed to refresh contacts: ${(e as Error).message}`);
 		}
+	}
+
+	private resolveRecipient(to: string): string {
+		const trimmed = to.trim();
+		if (/^[+\d]/.test(trimmed)) {
+			return trimmed;
+		}
+		const lower = trimmed.toLowerCase();
+		const match = this._contacts.find(c => c.name.toLowerCase() === lower || c.nick.toLowerCase() === lower);
+		if (match) {
+			this.log.debug(`Resolved contact "${trimmed}" → ${match.number}`);
+			return match.number;
+		}
+		this.log.warn(`Contact "${trimmed}" not found, using value as-is`);
+		return trimmed;
 	}
 
 	private extractMessageIds(result: unknown): string[] {
@@ -582,7 +644,7 @@ class Sevenio extends utils.Adapter {
 			this.getStateAsync('sms.flash'),
 		]);
 		const opts: SmsOpts = {
-			to: String(to?.val ?? ''),
+			to: this.resolveRecipient(String(to?.val ?? '')),
 			text: String(text?.val ?? ''),
 			from: String(from?.val ?? ''),
 			flash: Boolean(flash?.val ?? false),
