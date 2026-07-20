@@ -826,6 +826,15 @@ class Sevenio extends utils.Adapter {
     this.log.debug(`Initiating voice call to ${opts.to}`);
     return this.apiPost("/voice", body);
   }
+  parseBody(text) {
+    try {
+      return JSON.parse(text);
+    } catch {
+      const first = text.trim().split("\n")[0].trim();
+      const n = Number(first);
+      return Number.isNaN(n) ? first : n;
+    }
+  }
   async apiGet(path, params) {
     const url = new URL(`${API_BASE}${path}`);
     if (params) {
@@ -840,7 +849,7 @@ class Sevenio extends utils.Adapter {
     if (!res.ok) {
       throw new Error(`HTTP ${res.status} ${res.statusText}`);
     }
-    return res.json();
+    return this.parseBody(await res.text());
   }
   async apiPost(path, body) {
     const res = await fetch(`${API_BASE}${path}`, {
@@ -853,10 +862,10 @@ class Sevenio extends utils.Adapter {
       signal: AbortSignal.timeout(3e4)
     });
     if (!res.ok) {
-      const body2 = await res.text().catch(() => "");
-      throw new Error(`HTTP ${res.status} ${res.statusText}${body2 ? ` \u2014 ${body2}` : ""}`);
+      const errBody = await res.text().catch(() => "");
+      throw new Error(`HTTP ${res.status} ${res.statusText}${errBody ? ` \u2014 ${errBody}` : ""}`);
     }
-    return res.json();
+    return this.parseBody(await res.text());
   }
 }
 if (require.main !== module) {

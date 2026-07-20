@@ -939,6 +939,16 @@ class Sevenio extends utils.Adapter {
 		return this.apiPost('/voice', body);
 	}
 
+	private parseBody(text: string): unknown {
+		try {
+			return JSON.parse(text);
+		} catch {
+			const first = text.trim().split('\n')[0].trim();
+			const n = Number(first);
+			return Number.isNaN(n) ? first : n;
+		}
+	}
+
 	private async apiGet(path: string, params?: Record<string, string>): Promise<unknown> {
 		const url = new URL(`${API_BASE}${path}`);
 		if (params) {
@@ -953,7 +963,7 @@ class Sevenio extends utils.Adapter {
 		if (!res.ok) {
 			throw new Error(`HTTP ${res.status} ${res.statusText}`);
 		}
-		return res.json();
+		return this.parseBody(await res.text());
 	}
 
 	private async apiPost(path: string, body: Record<string, string>): Promise<unknown> {
@@ -967,10 +977,10 @@ class Sevenio extends utils.Adapter {
 			signal: AbortSignal.timeout(30_000),
 		});
 		if (!res.ok) {
-			const body = await res.text().catch(() => '');
-			throw new Error(`HTTP ${res.status} ${res.statusText}${body ? ` — ${body}` : ''}`);
+			const errBody = await res.text().catch(() => '');
+			throw new Error(`HTTP ${res.status} ${res.statusText}${errBody ? ` — ${errBody}` : ''}`);
 		}
-		return res.json();
+		return this.parseBody(await res.text());
 	}
 }
 
