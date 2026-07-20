@@ -124,7 +124,7 @@ class Sevenio extends utils.Adapter {
       }
       case "create_contact": {
         const { name, number } = obj.message;
-        void this.apiPost("/contacts", { nick: name, number }).then(async (result) => {
+        void this.apiPost("/contacts", { firstname: name, mobile_number: number }).then(async (result) => {
           await this.refreshContacts();
           respond(result);
         }).catch((e) => respond({ error: e.message }));
@@ -499,7 +499,7 @@ class Sevenio extends utils.Adapter {
       this._contacts = contacts;
       await this.setState("contacts.json", { val: JSON.stringify(contacts), ack: true });
       await this.setState("contacts.count", { val: contacts.length, ack: true });
-      const newKeys = new Set(contacts.map((c) => this.sanitizeName(c.name || c.nick)));
+      const newKeys = new Set(contacts.map((c) => this.sanitizeName(this.contactDisplayName(c))));
       const existingObjs = await this.getObjectViewAsync("system", "state", {
         startkey: `${this.namespace}.contacts.list.`,
         endkey: `${this.namespace}.contacts.list.\u9999`
@@ -517,11 +517,12 @@ class Sevenio extends utils.Adapter {
         native: {}
       });
       for (const c of contacts) {
-        const stateId = `contacts.list.${this.sanitizeName(c.name || c.nick)}`;
+        const displayName = this.contactDisplayName(c);
+        const stateId = `contacts.list.${this.sanitizeName(displayName)}`;
         await this.extendObjectAsync(stateId, {
           type: "state",
           common: {
-            name: c.name || c.nick,
+            name: displayName,
             type: "string",
             role: "text",
             read: true,
@@ -529,7 +530,7 @@ class Sevenio extends utils.Adapter {
           },
           native: {}
         });
-        await this.setState(stateId, { val: c.number, ack: true });
+        await this.setState(stateId, { val: this.contactNumber(c), ack: true });
       }
       this.log.debug(`Contacts refreshed: ${contacts.length} entries`);
     } catch (e) {
@@ -549,7 +550,7 @@ class Sevenio extends utils.Adapter {
       return;
     }
     try {
-      await this.apiPost("/contacts", { nick: name, number });
+      await this.apiPost("/contacts", { firstname: name, mobile_number: number });
       await this.setState("contacts.new.name", { val: "", ack: true });
       await this.setState("contacts.new.number", { val: "", ack: true });
       await this.refreshContacts();
@@ -557,6 +558,15 @@ class Sevenio extends utils.Adapter {
     } catch (e) {
       this.log.error(`Create contact failed: ${e.message}`);
     }
+  }
+  contactDisplayName(c) {
+    if (c.properties.fullname) {
+      return c.properties.fullname;
+    }
+    return [c.properties.firstname, c.properties.lastname].filter(Boolean).join(" ") || `Contact_${c.id}`;
+  }
+  contactNumber(c) {
+    return c.properties.mobile_number || c.properties.home_number || "";
   }
   sanitizeName(name) {
     return name.trim().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss").replace(/[^a-zA-Z0-9]/g, "_").replace(/_+/g, "_").replace(/^_+|_+$/g, "") || "contact";
@@ -567,10 +577,10 @@ class Sevenio extends utils.Adapter {
       return trimmed;
     }
     const lower = trimmed.toLowerCase();
-    const match = this._contacts.find((c) => c.name.toLowerCase() === lower || c.nick.toLowerCase() === lower);
+    const match = this._contacts.find((c) => this.contactDisplayName(c).toLowerCase() === lower);
     if (match) {
-      this.log.debug(`Resolved contact "${trimmed}" \u2192 ${match.number}`);
-      return match.number;
+      this.log.debug(`Resolved contact "${trimmed}" \u2192 ${this.contactNumber(match)}`);
+      return this.contactNumber(match);
     }
     this.log.warn(`Contact "${trimmed}" not found, using value as-is`);
     return trimmed;
