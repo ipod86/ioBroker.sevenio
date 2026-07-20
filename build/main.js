@@ -1,0 +1,346 @@
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var utils = __toESM(require("@iobroker/adapter-core"));
+const API_BASE = "https://gateway.seven.io/api";
+class Sevenio extends utils.Adapter {
+  _balanceTimer = null;
+  _stopped = false;
+  constructor(options = {}) {
+    super({ ...options, name: "sevenio" });
+    this.on("ready", this.onReady.bind(this));
+    this.on("stateChange", this.onStateChange.bind(this));
+    this.on("message", this.onMessage.bind(this));
+    this.on("unload", this.onUnload.bind(this));
+  }
+  async onReady() {
+    if (!this.config.apiKey) {
+      this.log.error("No API key configured \u2014 please set the API key in the adapter settings");
+      return;
+    }
+    await this.createObjectTree();
+    await this.validateConnection();
+    this.subscribeStates("sms.send");
+    this.subscribeStates("voice.send");
+    this.scheduleBalance();
+  }
+  onUnload(callback) {
+    this._stopped = true;
+    if (this._balanceTimer != null) {
+      this.clearTimeout(this._balanceTimer);
+      this._balanceTimer = null;
+    }
+    callback();
+  }
+  onStateChange(id, state) {
+    if (!state || state.ack) {
+      return;
+    }
+    const localId = id.replace(`${this.namespace}.`, "");
+    if (localId === "sms.send" && state.val === true) {
+      void this.triggerSms();
+    } else if (localId === "voice.send" && state.val === true) {
+      void this.triggerVoice();
+    }
+  }
+  onMessage(obj) {
+    if (!obj || typeof obj !== "object") {
+      return;
+    }
+    const respond = (result) => {
+      if (obj.callback) {
+        this.sendTo(obj.from, obj.command, result, obj.callback);
+      }
+    };
+    switch (obj.command) {
+      case "send": {
+        const msg = obj.message;
+        void this.sendSms(msg).then(respond).catch((e) => respond({ error: e.message }));
+        break;
+      }
+      case "voice": {
+        const msg = obj.message;
+        void this.sendVoice(msg).then(respond).catch((e) => respond({ error: e.message }));
+        break;
+      }
+      case "get_balance": {
+        void this.fetchBalance().then(respond).catch((e) => respond({ error: e.message }));
+        break;
+      }
+      default:
+        respond({ error: `Unknown command: ${obj.command}` });
+    }
+  }
+  async createObjectTree() {
+    await this.setObjectNotExistsAsync("account", {
+      type: "channel",
+      common: { name: "Account" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("account.balance", {
+      type: "state",
+      common: { name: "Balance", type: "number", role: "value", read: true, write: false, unit: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("account.currency", {
+      type: "state",
+      common: { name: "Currency", type: "string", role: "text", read: true, write: false },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("account.lastCheck", {
+      type: "state",
+      common: { name: "Last balance check", type: "string", role: "date", read: true, write: false },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms", {
+      type: "channel",
+      common: { name: "SMS" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.to", {
+      type: "state",
+      common: { name: "Recipient", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.from", {
+      type: "state",
+      common: { name: "Sender ID (empty = default)", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.text", {
+      type: "state",
+      common: { name: "Message text", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.flash", {
+      type: "state",
+      common: { name: "Flash SMS", type: "boolean", role: "switch", read: true, write: true, def: false },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.send", {
+      type: "state",
+      common: { name: "Send SMS (set to true to trigger)", type: "boolean", role: "button", read: true, write: true, def: false },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("sms.lastResult", {
+      type: "state",
+      common: { name: "Last send result (JSON)", type: "string", role: "json", read: true, write: false, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice", {
+      type: "channel",
+      common: { name: "Voice" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice.to", {
+      type: "state",
+      common: { name: "Recipient", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice.from", {
+      type: "state",
+      common: { name: "Verified caller number", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice.text", {
+      type: "state",
+      common: { name: "Text to speak (or TwiML)", type: "string", role: "text", read: true, write: true, def: "" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice.ringtime", {
+      type: "state",
+      common: { name: "Ring time in seconds (5-60)", type: "number", role: "value", read: true, write: true, def: 30, min: 5, max: 60, unit: "s" },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice.send", {
+      type: "state",
+      common: { name: "Start call (set to true to trigger)", type: "boolean", role: "button", read: true, write: true, def: false },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice.lastResult", {
+      type: "state",
+      common: { name: "Last call result (JSON)", type: "string", role: "json", read: true, write: false, def: "" },
+      native: {}
+    });
+  }
+  async validateConnection() {
+    try {
+      await this.fetchBalance();
+      await this.setState("info.connection", { val: true, ack: true });
+      this.log.info("Connected to seven.io API");
+    } catch (e) {
+      await this.setState("info.connection", { val: false, ack: true });
+      this.log.error(`Cannot connect to seven.io API: ${e.message}`);
+    }
+  }
+  scheduleBalance() {
+    var _a;
+    if (this._stopped) {
+      return;
+    }
+    const intervalMs = Math.max(1, (_a = this.config.balanceInterval) != null ? _a : 30) * 6e4;
+    this._balanceTimer = this.setTimeout(async () => {
+      this._balanceTimer = null;
+      if (this._stopped) {
+        return;
+      }
+      try {
+        const bal = await this.fetchBalance();
+        await this.setState("account.balance", { val: bal.amount, ack: true });
+        await this.setState("account.currency", { val: bal.currency, ack: true });
+        await this.setState("account.lastCheck", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
+      } catch (e) {
+        this.log.warn(`Balance polling failed: ${e.message}`);
+      }
+      this.scheduleBalance();
+    }, intervalMs);
+  }
+  async fetchBalance() {
+    const res = await this.apiGet("/balance");
+    const data = res;
+    await this.setState("account.balance", { val: data.amount, ack: true });
+    await this.setState("account.currency", { val: data.currency, ack: true });
+    await this.setState("account.lastCheck", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
+    return data;
+  }
+  async triggerSms() {
+    var _a, _b, _c, _d;
+    await this.setState("sms.send", { val: false, ack: true });
+    const [to, text, from, flash] = await Promise.all([
+      this.getStateAsync("sms.to"),
+      this.getStateAsync("sms.text"),
+      this.getStateAsync("sms.from"),
+      this.getStateAsync("sms.flash")
+    ]);
+    const opts = {
+      to: String((_a = to == null ? void 0 : to.val) != null ? _a : ""),
+      text: String((_b = text == null ? void 0 : text.val) != null ? _b : ""),
+      from: String((_c = from == null ? void 0 : from.val) != null ? _c : ""),
+      flash: Boolean((_d = flash == null ? void 0 : flash.val) != null ? _d : false)
+    };
+    if (!opts.to || !opts.text) {
+      this.log.warn('SMS send triggered but "to" or "text" is empty');
+      return;
+    }
+    try {
+      const result = await this.sendSms(opts);
+      await this.setState("sms.lastResult", { val: JSON.stringify(result), ack: true });
+    } catch (e) {
+      this.log.error(`SMS send failed: ${e.message}`);
+      await this.setState("sms.lastResult", { val: JSON.stringify({ error: e.message }), ack: true });
+    }
+  }
+  async triggerVoice() {
+    var _a, _b, _c, _d;
+    await this.setState("voice.send", { val: false, ack: true });
+    const [to, text, from, ringtime] = await Promise.all([
+      this.getStateAsync("voice.to"),
+      this.getStateAsync("voice.text"),
+      this.getStateAsync("voice.from"),
+      this.getStateAsync("voice.ringtime")
+    ]);
+    const opts = {
+      to: String((_a = to == null ? void 0 : to.val) != null ? _a : ""),
+      text: String((_b = text == null ? void 0 : text.val) != null ? _b : ""),
+      from: String((_c = from == null ? void 0 : from.val) != null ? _c : ""),
+      ringtime: Number((_d = ringtime == null ? void 0 : ringtime.val) != null ? _d : 30)
+    };
+    if (!opts.to || !opts.text) {
+      this.log.warn('Voice call triggered but "to" or "text" is empty');
+      return;
+    }
+    try {
+      const result = await this.sendVoice(opts);
+      await this.setState("voice.lastResult", { val: JSON.stringify(result), ack: true });
+    } catch (e) {
+      this.log.error(`Voice call failed: ${e.message}`);
+      await this.setState("voice.lastResult", { val: JSON.stringify({ error: e.message }), ack: true });
+    }
+  }
+  async sendSms(opts) {
+    if (!opts.to || !opts.text) {
+      throw new Error('"to" and "text" are required');
+    }
+    const body = {
+      to: opts.to,
+      text: opts.text,
+      from: opts.from || this.config.defaultSender || ""
+    };
+    if (opts.flash) {
+      body.flash = "1";
+    }
+    if (opts.delay) {
+      body.delay = opts.delay;
+    }
+    this.log.debug(`Sending SMS to ${opts.to}`);
+    return this.apiPost("/sms", body);
+  }
+  async sendVoice(opts) {
+    var _a;
+    if (!opts.to || !opts.text) {
+      throw new Error('"to" and "text" are required');
+    }
+    const ringtime = Math.min(60, Math.max(5, (_a = opts.ringtime) != null ? _a : 30));
+    const body = {
+      to: opts.to,
+      text: opts.text,
+      ringtime: String(ringtime)
+    };
+    if (opts.from) {
+      body.from = opts.from;
+    }
+    this.log.debug(`Initiating voice call to ${opts.to}`);
+    return this.apiPost("/voice", body);
+  }
+  async apiGet(path) {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: { "X-Api-Key": this.config.apiKey },
+      signal: AbortSignal.timeout(3e4)
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    }
+    return res.json();
+  }
+  async apiPost(path, body) {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: {
+        "X-Api-Key": this.config.apiKey,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams(body).toString(),
+      signal: AbortSignal.timeout(3e4)
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    }
+    return res.json();
+  }
+}
+if (require.main !== module) {
+  module.exports = (options) => new Sevenio(options);
+} else {
+  (() => new Sevenio())();
+}
+//# sourceMappingURL=main.js.map

@@ -2,9 +2,19 @@
 	"i18n": true,
 	"type": "panel",
 	"items": {
-		"option1": {
-			"type": "checkbox",
-			"label": "option1",
+		"apiKey": {
+			"type": "password",
+			"label": "apiKey",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 8,
+			"lg": 6,
+			"xl": 6
+		},
+		"defaultSender": {
+			"type": "text",
+			"label": "defaultSender",
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
@@ -12,10 +22,12 @@
 			"lg": 4,
 			"xl": 4
 		},
-		"option2": {
-			"type": "text",
-			"label": "option2",
+		"balanceInterval": {
+			"type": "number",
+			"label": "balanceInterval",
 			"newLine": true,
+			"min": 1,
+			"max": 1440,
 			"xs": 12,
 			"sm": 12,
 			"md": 6,

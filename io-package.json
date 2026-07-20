@@ -58,6 +58,7 @@
 		"tier": 3,
 		"mode": "daemon",
 		"type": "messaging",
+		"messagebox": true,
 		"compact": true,
 		"connectionType": "cloud",
 		"dataSource": "poll",
@@ -76,9 +77,32 @@
 		]
 	},
 	"native": {
-		"option1": true,
-		"option2": "42"
+		"apiKey": "",
+		"defaultSender": "",
+		"balanceInterval": 30
 	},
 	"objects": [],
-	"instanceObjects": []
+	"instanceObjects": [
+		{
+			"_id": "info",
+			"type": "channel",
+			"common": {
+				"name": "Information"
+			},
+			"native": {}
+		},
+		{
+			"_id": "info.connection",
+			"type": "state",
+			"common": {
+				"name": "Connected to seven.io API",
+				"type": "boolean",
+				"role": "indicator.connected",
+				"read": true,
+				"write": false,
+				"def": false
+			},
+			"native": {}
+		}
+	]
 }

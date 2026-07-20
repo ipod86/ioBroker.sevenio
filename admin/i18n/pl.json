@@ -1,5 +1,6 @@
 {
-	"sevenio adapter settings": "Ustawienia adaptera dla sevenio",
-	"option1": "opcja 1",
-	"option2": "opcja 2"
+	"sevenio adapter settings": "seven.io Adapter Settings",
+	"apiKey": "API Key",
+	"defaultSender": "Default Sender ID (optional)",
+	"balanceInterval": "Balance polling interval (minutes)"
 }
