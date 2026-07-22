@@ -10,7 +10,10 @@
 	"defaultGetReplies": "通过共享号码池回复（免费，无需自己的号码）",
 	"defaultGetRepliesInfo": "ℹ️ seven.io临时分配共享号码池中的号码作为发件人——收件人可在48小时内回复。适用于DE、AT、CH、US、PL。2周内seven.io会尝试重用同一号码——不保证。",
 	"inboundInterval": "接收轮询间隔（分钟，0=关闭）",
-	"inboundIntervalHelp": "检查接收短信的频率。适用于两种选项：共享号码池回复（启用共享池选项时）和自己租用的接收号码（约20欧元/月）。设为0禁用轮询。",
+	"inboundIntervalHelp": "0=关闭。设为>0时，下方显示两种接收选项。",
+	"headerSharedPool": "选项1 — 共享号码池（免费，无需自己的号码）",
+	"headerOwnNumber": "选项2 — 自己的接收号码（约20欧元/月）",
+	"ownNumberInfo": "在上方默认发件人ID中输入租用的号码。从该号码发出的短信始终可以回复。回复将按上方设置的间隔获取。",
 	"headerPricing": "价格与统计",
 	"pricingCountry": "价格查询国家代码（如DE、US）",
 	"pricingCountryHelp": "ISO国家代码用于筛选价格数据。留空显示所有国家。"
