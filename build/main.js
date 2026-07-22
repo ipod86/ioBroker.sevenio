@@ -535,19 +535,16 @@ class Sevenio extends utils.Adapter {
     if (newMessages.length === 0) {
       return;
     }
-    for (const m of newMessages) {
+    const ordered = [...newMessages].reverse();
+    for (const m of ordered) {
       const preview = m.text.length > 60 ? `${m.text.substring(0, 60)}\u2026` : m.text;
       this.log.info(`Inbound SMS from ${m.from}: ${preview}`);
+      await this.setState("sms.inbound.id", { val: m.id, ack: true });
+      await this.setState("sms.inbound.from", { val: m.from, ack: true });
+      await this.setState("sms.inbound.text", { val: m.text, ack: true });
+      await this.setState("sms.inbound.timestamp", { val: m.timestamp, ack: true });
     }
-    if (newMessages.length > 1) {
-      this.log.info(`${newMessages.length} new inbound messages \u2014 data points contain the latest only`);
-    }
-    const latest = newMessages[0];
-    this._lastInboundId = latest.id;
-    await this.setState("sms.inbound.id", { val: latest.id, ack: true });
-    await this.setState("sms.inbound.from", { val: latest.from, ack: true });
-    await this.setState("sms.inbound.text", { val: latest.text, ack: true });
-    await this.setState("sms.inbound.timestamp", { val: latest.timestamp, ack: true });
+    this._lastInboundId = newMessages[0].id;
   }
   async fetchInboundMessages() {
     const res = await this.apiGet("/journal/inbound", { limit: "50" });
