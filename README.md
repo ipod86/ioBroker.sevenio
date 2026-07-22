@@ -47,9 +47,10 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | Setting | Description | Default |
 |---|---|---|
 | **API Key** | Your seven.io API key | *(required)* |
-| **Default Sender ID** | Sender name or number shown to recipients (max 11 alphanumeric or 16 numeric characters). Optional — leave empty to use the seven.io account default. | *(empty)* |
+| **Default Sender ID** | Sender name or number shown to recipients. Max 11 alphanumeric **or** 16 numeric characters. **Alphanumeric sender IDs cannot receive SMS replies** — only numeric senders or a rented virtual number allow inbound SMS. Leave empty to use the seven.io account default. | *(empty)* |
 | **Balance polling interval** | How often (in minutes) the adapter polls your account balance | `30` |
 | **Inbound SMS polling interval** | How often (in minutes) the adapter checks for new incoming SMS. Set to `0` to disable inbound polling entirely. | `0` |
+| **Country code for pricing** | ISO country code (e.g. `DE`, `US`) to load SMS pricing for that country only. Leave empty to load all countries. | *(empty)* |
 
 ---
 
@@ -107,6 +108,25 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | `voice.ringtime` | number | rw | How long to ring before hanging up (5–60 seconds, default 30) |
 | `voice.send` | boolean | rw | Set to `true` to start the call — resets to `false` automatically |
 | `voice.lastResult` | string (JSON) | r | Full API response of the last call attempt |
+| `voice.lastStatus` | string | r | Human-readable status of the last call (e.g. `Success`, `Call failed`) |
+
+### `pricing`
+| State | Type | Description |
+|---|---|---|
+| `pricing.json` | string (JSON) | Full pricing data from seven.io — per-network SMS prices for the configured country or all countries |
+| `pricing.lastUpdate` | string | ISO timestamp of the last pricing fetch |
+| `pricing.refresh` | boolean | Set to `true` to refresh pricing data immediately |
+
+### `stats` *(last 30 days)*
+| State | Type | Description |
+|---|---|---|
+| `stats.smsSent` | number | Total outbound SMS sent in the last 30 days |
+| `stats.voiceCalls` | number | Total voice calls made in the last 30 days |
+| `stats.inbound` | number | Total inbound SMS received in the last 30 days |
+| `stats.totalCost` | number | Total cost in EUR for the last 30 days |
+| `stats.lastUpdate` | string | ISO timestamp of the last stats fetch |
+| `stats.json` | string (JSON) | Raw analytics data grouped by day |
+| `stats.refresh` | boolean | Set to `true` to refresh statistics immediately |
 
 ---
 
@@ -174,6 +194,20 @@ sendTo('sevenio.0', 'get_contacts', {}, contacts => {
 sendTo('sevenio.0', 'create_contact', {
     name: 'Max Mustermann',
     number: '491234567890',   // without +
+});
+```
+
+**Test SMS (send a test message to verify the API key):**
+```javascript
+sendTo('sevenio.0', 'test_sms', { to: '+491234567890' }, result => {
+    console.log(result.statusText);
+});
+```
+
+**Test voice call:**
+```javascript
+sendTo('sevenio.0', 'test_voice', { to: '+491234567890' }, result => {
+    console.log(result);
 });
 ```
 

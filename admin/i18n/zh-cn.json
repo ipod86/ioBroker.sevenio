@@ -1,8 +1,11 @@
 {
-	"sevenio adapter settings": "seven.io Adapter Settings",
-	"apiKey": "API Key",
-	"defaultSender": "Default Sender ID (optional)",
-	"balanceInterval": "Balance polling interval (minutes)",
-	"inboundInterval": "Inbound SMS polling interval (minutes)",
-	"inboundIntervalHelp": "0 = disabled. Requires a number that can receive SMS (seven.io virtual number)."
+	"sevenio adapter settings": "seven.io 适配器设置",
+	"apiKey": "API密钥",
+	"defaultSender": "默认发件人ID（可选）",
+	"defaultSenderHelp": "最多11个字母数字或16个数字字符。空 = seven.io账户默认值。字母数字发件人ID无法接收短信回复。",
+	"balanceInterval": "余额查询间隔（分钟）",
+	"inboundInterval": "入站短信查询间隔（分钟）",
+	"inboundIntervalHelp": "0 = 禁用。需要seven.io虚拟号码（约20欧元/月）。字母数字发件人无法接收短信——只有数字发件人或租用的虚拟号码才允许入站短信。",
+	"pricingCountry": "价格查询国家代码（如DE、US）",
+	"pricingCountryHelp": "ISO国家代码用于筛选价格数据。留空显示所有国家。"
 }

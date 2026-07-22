@@ -107,12 +107,16 @@ class Sevenio extends utils.Adapter {
     this.subscribeStates("voice.send");
     this.subscribeStates("contacts.refresh");
     this.subscribeStates("contacts.new.save");
+    this.subscribeStates("pricing.refresh");
+    this.subscribeStates("stats.refresh");
     await this.refreshContacts();
     this.scheduleBalance();
     if (this.cfg.inboundInterval > 0) {
       await this.initInbound();
       this.scheduleInbound();
     }
+    await this.fetchPricing();
+    await this.fetchStats();
   }
   onUnload(callback) {
     this._stopped = true;
@@ -145,9 +149,16 @@ class Sevenio extends utils.Adapter {
     } else if (localId === "contacts.new.save" && state.val === true) {
       void this.setState("contacts.new.save", { val: false, ack: true });
       void this.triggerCreateContact();
+    } else if (localId === "pricing.refresh" && state.val === true) {
+      void this.setState("pricing.refresh", { val: false, ack: true });
+      void this.fetchPricing();
+    } else if (localId === "stats.refresh" && state.val === true) {
+      void this.setState("stats.refresh", { val: false, ack: true });
+      void this.fetchStats();
     }
   }
   onMessage(obj) {
+    var _a, _b;
     if (!obj || typeof obj !== "object") {
       return;
     }
@@ -161,12 +172,12 @@ class Sevenio extends utils.Adapter {
         const msg = obj.message;
         const smsOpts = { ...msg, to: this.resolveRecipient(msg.to) };
         void this.sendSms(smsOpts).then(async (result) => {
-          var _a, _b;
+          var _a2, _b2;
           const enriched = enrichSmsResult(result);
           await this.setState("sms.to", { val: msg.to, ack: true });
           await this.setState("sms.text", { val: smsOpts.text, ack: true });
-          await this.setState("sms.from", { val: (_a = smsOpts.from) != null ? _a : "", ack: true });
-          await this.setState("sms.flash", { val: (_b = smsOpts.flash) != null ? _b : false, ack: true });
+          await this.setState("sms.from", { val: (_a2 = smsOpts.from) != null ? _a2 : "", ack: true });
+          await this.setState("sms.flash", { val: (_b2 = smsOpts.flash) != null ? _b2 : false, ack: true });
           const status = smsStatusText(enriched);
           if (smsIsSuccess(enriched)) {
             this.log.debug(`SMS to ${msg.to}: ${status}`);
@@ -183,11 +194,11 @@ class Sevenio extends utils.Adapter {
       case "voice": {
         const msg = obj.message;
         void this.sendVoice(msg).then(async (result) => {
-          var _a, _b;
+          var _a2, _b2;
           await this.setState("voice.to", { val: msg.to, ack: true });
           await this.setState("voice.text", { val: msg.text, ack: true });
-          await this.setState("voice.from", { val: (_a = msg.from) != null ? _a : "", ack: true });
-          await this.setState("voice.ringtime", { val: (_b = msg.ringtime) != null ? _b : 30, ack: true });
+          await this.setState("voice.from", { val: (_a2 = msg.from) != null ? _a2 : "", ack: true });
+          await this.setState("voice.ringtime", { val: (_b2 = msg.ringtime) != null ? _b2 : 30, ack: true });
           const vStatus = voiceStatusText(result);
           if (voiceIsSuccess(result)) {
             this.log.debug(`Voice call to ${msg.to}: ${vStatus}`);
@@ -216,6 +227,19 @@ class Sevenio extends utils.Adapter {
         }).catch((e) => respond({ error: e.message }));
         break;
       }
+      case "test_sms": {
+        const tmsg = obj.message;
+        void this.sendSms({ to: tmsg.to, text: (_a = tmsg.text) != null ? _a : "seven.io adapter test" }).then((result) => respond(enrichSmsResult(result))).catch((e) => respond({ error: e.message }));
+        break;
+      }
+      case "test_voice": {
+        const tvmsg = obj.message;
+        void this.sendVoice({
+          to: tvmsg.to,
+          text: (_b = tvmsg.text) != null ? _b : "This is a test call from the seven.io ioBroker adapter."
+        }).then(respond).catch((e) => respond({ error: e.message }));
+        break;
+      }
       default:
         respond({ error: `Unknown command: ${obj.command}` });
     }
@@ -228,7 +252,9 @@ class Sevenio extends utils.Adapter {
       ["contacts.list", "Contact list"],
       ["sms", "SMS"],
       ["sms.inbound", "Last received SMS"],
-      ["voice", "Voice"]
+      ["voice", "Voice"],
+      ["pricing", "Pricing"],
+      ["stats", "Statistics (last 30 days)"]
     ]) {
       await this.setObjectNotExistsAsync(id, { type: "channel", common: { name }, native: {} });
     }
@@ -338,6 +364,54 @@ class Sevenio extends utils.Adapter {
       [
         "voice.lastStatus",
         { name: "Last call status", type: "string", role: "text", read: true, write: false, def: "" }
+      ],
+      [
+        "pricing.json",
+        { name: "Pricing data (JSON)", type: "string", role: "json", read: true, write: false, def: "" }
+      ],
+      [
+        "pricing.lastUpdate",
+        { name: "Last pricing update", type: "string", role: "date", read: true, write: false, def: "" }
+      ],
+      [
+        "pricing.refresh",
+        { name: "Refresh pricing", type: "boolean", role: "button", read: false, write: true, def: false }
+      ],
+      [
+        "stats.json",
+        { name: "Analytics by date (JSON)", type: "string", role: "json", read: true, write: false, def: "" }
+      ],
+      [
+        "stats.smsSent",
+        { name: "SMS sent (30 days)", type: "number", role: "value", read: true, write: false, def: 0 }
+      ],
+      [
+        "stats.voiceCalls",
+        { name: "Voice calls (30 days)", type: "number", role: "value", read: true, write: false, def: 0 }
+      ],
+      [
+        "stats.inbound",
+        { name: "Inbound SMS (30 days)", type: "number", role: "value", read: true, write: false, def: 0 }
+      ],
+      [
+        "stats.totalCost",
+        {
+          name: "Total cost EUR (30 days)",
+          type: "number",
+          role: "value",
+          read: true,
+          write: false,
+          def: 0,
+          unit: "\u20AC"
+        }
+      ],
+      [
+        "stats.lastUpdate",
+        { name: "Last stats update", type: "string", role: "date", read: true, write: false, def: "" }
+      ],
+      [
+        "stats.refresh",
+        { name: "Refresh statistics", type: "boolean", role: "button", read: false, write: true, def: false }
       ]
     ];
     for (const [id, common] of states) {
@@ -708,6 +782,55 @@ class Sevenio extends utils.Adapter {
       id: (_c = lines[1]) != null ? _c : "",
       cost: parseFloat((_d = lines[2]) != null ? _d : "0") || 0
     };
+  }
+  async fetchPricing() {
+    try {
+      const params = {};
+      if (this.cfg.pricingCountry) {
+        params.country = this.cfg.pricingCountry.toLowerCase();
+      }
+      const res = await this.apiGet("/pricing", Object.keys(params).length ? params : void 0);
+      await this.setState("pricing.json", { val: JSON.stringify(res), ack: true });
+      await this.setState("pricing.lastUpdate", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
+      this.log.debug("Pricing data fetched");
+    } catch (e) {
+      this.log.warn(`Pricing fetch failed: ${e.message}`);
+    }
+  }
+  async fetchStats() {
+    try {
+      const end = /* @__PURE__ */ new Date();
+      const start = new Date(end.getTime() - 30 * 24 * 60 * 60 * 1e3);
+      const params = {
+        start: start.toISOString().slice(0, 10),
+        end: end.toISOString().slice(0, 10)
+      };
+      const res = await this.apiGet("/analytics/date", params);
+      const entries = Array.isArray(res) ? res : [];
+      const totals = entries.reduce(
+        (acc, e) => {
+          var _a, _b, _c, _d;
+          return {
+            sms: acc.sms + ((_a = e.sms) != null ? _a : 0),
+            voice: acc.voice + ((_b = e.voice) != null ? _b : 0),
+            inbound: acc.inbound + ((_c = e.inbound) != null ? _c : 0),
+            cost: acc.cost + ((_d = e.usage_eur) != null ? _d : 0)
+          };
+        },
+        { sms: 0, voice: 0, inbound: 0, cost: 0 }
+      );
+      await this.setState("stats.json", { val: JSON.stringify(entries), ack: true });
+      await this.setState("stats.smsSent", { val: totals.sms, ack: true });
+      await this.setState("stats.voiceCalls", { val: totals.voice, ack: true });
+      await this.setState("stats.inbound", { val: totals.inbound, ack: true });
+      await this.setState("stats.totalCost", { val: Math.round(totals.cost * 1e4) / 1e4, ack: true });
+      await this.setState("stats.lastUpdate", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
+      this.log.debug(
+        `Stats: ${totals.sms} SMS, ${totals.voice} voice, ${totals.inbound} inbound, ${totals.cost.toFixed(4)} EUR (last 30 days)`
+      );
+    } catch (e) {
+      this.log.warn(`Stats fetch failed: ${e.message}`);
+    }
   }
   async apiPostText(path, body) {
     const res = await fetch(`${API_BASE}${path}`, {

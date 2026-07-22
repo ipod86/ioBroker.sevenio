@@ -81,7 +81,8 @@
 		"apiKey": "",
 		"defaultSender": "",
 		"balanceInterval": 30,
-		"inboundInterval": 0
+		"inboundInterval": 0,
+		"pricingCountry": ""
 	},
 	"objects": [],
 	"instanceObjects": [

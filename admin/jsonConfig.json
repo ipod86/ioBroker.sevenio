@@ -15,6 +15,7 @@
 		"defaultSender": {
 			"type": "text",
 			"label": "defaultSender",
+			"help": "defaultSenderHelp",
 			"newLine": true,
 			"xs": 12,
 			"sm": 12,
@@ -46,6 +47,17 @@
 			"md": 6,
 			"lg": 4,
 			"xl": 4
+		},
+		"pricingCountry": {
+			"type": "text",
+			"label": "pricingCountry",
+			"help": "pricingCountryHelp",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 4,
+			"lg": 3,
+			"xl": 3
 		}
 	}
 }

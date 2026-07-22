@@ -1,8 +1,11 @@
 {
-	"sevenio adapter settings": "seven.io Adapter Settings",
-	"apiKey": "API Key",
-	"defaultSender": "Default Sender ID (optional)",
-	"balanceInterval": "Balance polling interval (minutes)",
-	"inboundInterval": "Inbound SMS polling interval (minutes)",
-	"inboundIntervalHelp": "0 = disabled. Requires a number that can receive SMS (seven.io virtual number)."
+	"sevenio adapter settings": "Настройки адаптера seven.io",
+	"apiKey": "API-ключ",
+	"defaultSender": "Стандартный идентификатор отправителя (необязательно)",
+	"defaultSenderHelp": "Макс. 11 буквенно-цифровых или 16 цифровых символов. Пусто = значение по умолчанию seven.io. Буквенный ID отправителя не может получать ответные SMS.",
+	"balanceInterval": "Интервал опроса баланса (минуты)",
+	"inboundInterval": "Интервал опроса входящих SMS (минуты)",
+	"inboundIntervalHelp": "0 = отключено. Требуется виртуальный номер seven.io (~20 €/мес). Буквенные отправители не могут получать SMS — только числовые или арендованный виртуальный номер.",
+	"pricingCountry": "Код страны для тарифов (например DE, US)",
+	"pricingCountryHelp": "ISO-код страны для фильтрации тарифных данных. Оставьте пустым для всех стран."
 }

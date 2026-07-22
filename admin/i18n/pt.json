@@ -1,8 +1,11 @@
 {
-	"sevenio adapter settings": "seven.io Adapter Settings",
-	"apiKey": "API Key",
-	"defaultSender": "Default Sender ID (optional)",
-	"balanceInterval": "Balance polling interval (minutes)",
-	"inboundInterval": "Inbound SMS polling interval (minutes)",
-	"inboundIntervalHelp": "0 = disabled. Requires a number that can receive SMS (seven.io virtual number)."
+	"sevenio adapter settings": "Configurações do adaptador seven.io",
+	"apiKey": "Chave API",
+	"defaultSender": "ID de remetente padrão (opcional)",
+	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos ou 16 numéricos. Vazio = padrão seven.io. Um ID de remetente alfanumérico não pode receber respostas SMS.",
+	"balanceInterval": "Intervalo de consulta de saldo (minutos)",
+	"inboundInterval": "Intervalo de SMS recebidos (minutos)",
+	"inboundIntervalHelp": "0 = desativado. Requer um número virtual seven.io (~20 €/mês). Remetentes alfanuméricos não podem receber SMS — apenas remetentes numéricos ou número virtual alugado permitem isso.",
+	"pricingCountry": "Código de país para preços (ex. DE, US)",
+	"pricingCountryHelp": "Código ISO do país para filtrar dados de preços. Deixe vazio para todos os países."
 }

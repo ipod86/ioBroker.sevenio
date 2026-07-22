@@ -1,8 +1,11 @@
 {
-	"sevenio adapter settings": "seven.io Adapter Settings",
-	"apiKey": "API Key",
-	"defaultSender": "Default Sender ID (optional)",
-	"balanceInterval": "Balance polling interval (minutes)",
-	"inboundInterval": "Inbound SMS polling interval (minutes)",
-	"inboundIntervalHelp": "0 = disabled. Requires a number that can receive SMS (seven.io virtual number)."
+	"sevenio adapter settings": "seven.io adapter instellingen",
+	"apiKey": "API-sleutel",
+	"defaultSender": "Standaard afzender-ID (optioneel)",
+	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Een alfanumerieke afzender-ID kan geen SMS-antwoorden ontvangen.",
+	"balanceInterval": "Saldo-polling interval (minuten)",
+	"inboundInterval": "Binnenkomende SMS interval (minuten)",
+	"inboundIntervalHelp": "0 = uitgeschakeld. Vereist een virtueel seven.io nummer (~20 €/maand). Alfanumerieke afzenders kunnen geen SMS ontvangen — alleen numerieke afzenders of een gehuurd virtueel nummer staan dit toe.",
+	"pricingCountry": "Landcode voor prijzen (bijv. DE, US)",
+	"pricingCountryHelp": "ISO-landcode om prijsgegevens te filteren. Leeg laten voor alle landen."
 }

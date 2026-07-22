@@ -2,7 +2,10 @@
 	"sevenio adapter settings": "seven.io Adapter Settings",
 	"apiKey": "API Key",
 	"defaultSender": "Default Sender ID (optional)",
+	"defaultSenderHelp": "Max. 11 alphanumeric or 16 numeric characters. Empty = seven.io account default. Alphanumeric sender IDs cannot receive SMS replies — only numeric senders allow inbound.",
 	"balanceInterval": "Balance polling interval (minutes)",
 	"inboundInterval": "Inbound SMS polling interval (minutes)",
-	"inboundIntervalHelp": "0 = disabled. Requires a number that can receive SMS (seven.io virtual number)."
+	"inboundIntervalHelp": "0 = disabled. Requires a virtual number rented from seven.io (~€20/month). Alphanumeric senders cannot receive replies — only numeric senders or a rented virtual number allow inbound SMS.",
+	"pricingCountry": "Country code for pricing (e.g. DE, US)",
+	"pricingCountryHelp": "ISO country code to filter pricing data. Leave empty to load prices for all countries."
 }

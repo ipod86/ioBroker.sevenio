@@ -2,7 +2,10 @@
 	"sevenio adapter settings": "seven.io Adapter-Einstellungen",
 	"apiKey": "API-Schlüssel",
 	"defaultSender": "Standard-Absender-ID (optional)",
+	"defaultSenderHelp": "Max. 11 alphanumerische oder 16 numerische Zeichen. Leer = Kontovorgabe seven.io. Alphanumerische Absender-IDs können keine SMS-Antworten empfangen — nur numerische Absender ermöglichen Inbound.",
 	"balanceInterval": "Kontostand-Abfrageintervall (Minuten)",
 	"inboundInterval": "Eingehende SMS – Abfrageintervall (Minuten)",
-	"inboundIntervalHelp": "0 = deaktiviert. Erfordert eine Rufnummer im seven.io-Account, die SMS empfangen kann."
+	"inboundIntervalHelp": "0 = deaktiviert. Erfordert eine bei seven.io gemietete Rufnummer (~20 €/Monat). Alphanumerische Absender können keine Antworten empfangen — eingehende SMS funktionieren nur mit numerischem Absender oder gemieteter Rufnummer.",
+	"pricingCountry": "Ländercode für Preisabfrage (z. B. DE, US)",
+	"pricingCountryHelp": "ISO-Ländercode zum Filtern der Preisdaten. Leer lassen für alle Länder."
 }
