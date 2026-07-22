@@ -53,17 +53,17 @@ Blockly.Words['sevenio_flash'] = {
     pl: 'Flash SMS', uk: 'Flash SMS', 'zh-cn': '闪信',
 };
 Blockly.Words['sevenio_get_replies'] = {
-    en: 'enable replies (shared pool)',
-    de: 'Antworten aktivieren (Shared Pool)',
-    ru: 'разрешить ответы (общий пул)',
-    pt: 'ativar respostas (pool compartilhado)',
-    nl: 'antwoorden inschakelen (gedeelde pool)',
-    fr: 'activer les réponses (pool partagé)',
-    it: 'abilita risposte (pool condiviso)',
-    es: 'habilitar respuestas (pool compartido)',
-    pl: 'włącz odpowiedzi (pula wspólna)',
-    uk: 'увімкнути відповіді (спільний пул)',
-    'zh-cn': '启用回复（共享号码池）',
+    en: 'replies (shared pool)',
+    de: 'Antworten (Shared Pool)',
+    ru: 'ответы (общий пул)',
+    pt: 'respostas (pool compartilhado)',
+    nl: 'antwoorden (gedeelde pool)',
+    fr: 'réponses (pool partagé)',
+    it: 'risposte (pool condiviso)',
+    es: 'respuestas (pool compartido)',
+    pl: 'odpowiedzi (pula wspólna)',
+    uk: 'відповіді (спільний пул)',
+    'zh-cn': '回复（共享号码池）',
 };
 Blockly.Words['sevenio_ringtime'] = {
     en: 'ring time (s)',        de: 'Klingelzeit (s)',      ru: 'время звонка (с)',
