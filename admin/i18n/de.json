@@ -16,5 +16,5 @@
 	"defaultGetRepliesInfo": "ℹ️ seven.io weist temporär eine Pool-Nummer als Absender zu — Empfänger können innerhalb von 48 Std. antworten. Verfügbar für DE, AT, CH, US, PL. Innerhalb von 2 Wochen versucht seven.io dieselbe Nummer zu verwenden — ohne Garantie.",
 	"headerSharedPool": "Option 1 — Shared Pool (kostenlos, keine eigene Nummer)",
 	"headerOwnNumber": "Option 2 — Eigene Inbound-Nummer (~20 €/Monat)",
-	"ownNumberInfo": "Gemietete Rufnummer oben als 'Standard-Absender-ID' eintragen. SMS von dieser Nummer können jederzeit beantwortet werden. Antworten werden im oben eingestellten Intervall abgerufen."
+	"ownNumberInfo": "Gemietete Rufnummer in 'Standard-Absender-ID' eintragen. SMS von dieser Nummer können jederzeit beantwortet werden — kein Shared Pool nötig."
 }

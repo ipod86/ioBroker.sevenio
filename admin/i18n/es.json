@@ -16,5 +16,5 @@
 	"defaultGetRepliesInfo": "ℹ️ seven.io asigna temporalmente un número de pool compartido como remitente — los destinatarios pueden responder en 48 h. Disponible para DE, AT, CH, US, PL. En 2 semanas seven.io intenta reutilizar el mismo número — sin garantía.",
 	"headerSharedPool": "Opción 1 — Pool compartido (gratuito, sin número propio)",
 	"headerOwnNumber": "Opción 2 — Número entrante propio (~20 €/mes)",
-	"ownNumberInfo": "Introduce el número alquilado arriba como 'ID de remitente predeterminado'. Los SMS enviados desde ese número siempre pueden recibir respuestas. Las respuestas se obtienen en el intervalo establecido arriba."
+	"ownNumberInfo": "Introduce el número alquilado en 'ID de remitente predeterminado'. Los SMS enviados desde ese número siempre pueden recibir respuestas — sin pool compartido."
 }

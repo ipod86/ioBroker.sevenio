@@ -16,5 +16,5 @@
 	"defaultGetRepliesInfo": "ℹ️ seven.io wijst tijdelijk een gedeeld poolnummer toe als afzender — ontvangers kunnen binnen 48 u antwoorden. Beschikbaar voor DE, AT, CH, US, PL. Binnen 2 weken probeert seven.io hetzelfde nummer te hergebruiken — zonder garantie.",
 	"headerSharedPool": "Optie 1 — Gedeelde pool (gratis, zonder eigen nummer)",
 	"headerOwnNumber": "Optie 2 — Eigen inbound nummer (~€20/maand)",
-	"ownNumberInfo": "Voer het gehuurde nummer hierboven in als 'Standaard afzender-ID'. SMS verzonden vanaf dat nummer kunnen altijd worden beantwoord. Antwoorden worden opgehaald op het interval hierboven."
+	"ownNumberInfo": "Voer het gehuurde nummer in bij 'Standaard afzender-ID'. SMS verzonden vanaf dat nummer kunnen altijd worden beantwoord — geen gedeelde pool nodig."
 }

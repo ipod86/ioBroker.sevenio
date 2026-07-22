@@ -29,22 +29,6 @@
 			"lg": 3,
 			"xl": 3
 		},
-		"_header_sender": {
-			"type": "header",
-			"text": "headerSender",
-			"newLine": true
-		},
-		"defaultSender": {
-			"type": "text",
-			"label": "defaultSender",
-			"help": "defaultSenderHelp",
-			"newLine": true,
-			"xs": 12,
-			"sm": 12,
-			"md": 6,
-			"lg": 4,
-			"xl": 4
-		},
 		"_header_inbound": {
 			"type": "header",
 			"text": "headerInbound",
@@ -62,6 +46,17 @@
 			"md": 4,
 			"lg": 3,
 			"xl": 3
+		},
+		"defaultSender": {
+			"type": "text",
+			"label": "defaultSender",
+			"help": "defaultSenderHelp",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
 		},
 		"_header_opt1": {
 			"type": "header",

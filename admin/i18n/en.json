@@ -16,5 +16,5 @@
 	"defaultGetRepliesInfo": "ℹ️ seven.io temporarily assigns a shared pool number as sender — recipients can reply within 48 h. Available for DE, AT, CH, US, PL. seven.io tries to reuse the same number within 2 weeks, but this is not guaranteed.",
 	"headerSharedPool": "Option 1 — Shared Pool (free, no own number)",
 	"headerOwnNumber": "Option 2 — Own inbound number (~€20/month)",
-	"ownNumberInfo": "Enter your rented number as 'Default Sender ID' above. SMS sent from that number can always be replied to. Replies are fetched at the interval set above."
+	"ownNumberInfo": "Enter your rented number in 'Default Sender ID'. SMS sent from that number can always be replied to — no shared pool needed."
 }
