@@ -7,11 +7,11 @@
 	"defaultSender": "Standaard afzender-ID (optioneel)",
 	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Alfanumerieke ID's (bijv. 'MijnBedrijf') kunnen geen directe antwoorden ontvangen — gebruik de gedeelde pool hieronder, of voer hier uw eigen gehuurd nummer (numeriek) in voor permanente inbound.",
 	"headerInbound": "Inkomende SMS & antwoorden",
-	"defaultGetReplies": "Antwoorden standaard inschakelen (gedeelde pool, gratis)",
-	"defaultGetRepliesHelp": "seven.io wijst tijdelijk een gedeeld poolnummer toe als afzender zodat ontvangers binnen 48 u kunnen antwoorden. Werkt ongeacht de afzender-ID hierboven. Geen eigen nummer vereist. Beschikbaar voor DE, AT, CH, US, PL. Binnen 2 weken probeert seven.io hetzelfde nummer te hergebruiken — zonder garantie.",
+	"defaultGetReplies": "Antwoorden via gedeelde pool (gratis, zonder eigen nummer)",
 	"inboundInterval": "Inbound polling interval (minuten, 0 = uit)",
 	"inboundIntervalHelp": "Hoe vaak inkomende SMS worden gecontroleerd. Werkt voor beide opties: antwoorden via gedeelde pool (als 'Antwoorden inschakelen' aan staat) en eigen gehuurd inbound nummer (~€20/maand). Op 0 zetten om polling uit te schakelen.",
 	"headerPricing": "Prijzen & statistieken",
 	"pricingCountry": "Landcode voor prijzen (bijv. DE, US)",
-	"pricingCountryHelp": "ISO-landcode om prijsgegevens te filteren. Leeg laten voor alle landen."
+	"pricingCountryHelp": "ISO-landcode om prijsgegevens te filteren. Leeg laten voor alle landen.",
+	"defaultGetRepliesInfo": "ℹ️ seven.io wijst tijdelijk een gedeeld poolnummer toe als afzender — ontvangers kunnen binnen 48 u antwoorden. Beschikbaar voor DE, AT, CH, US, PL. Binnen 2 weken probeert seven.io hetzelfde nummer te hergebruiken — zonder garantie."
 }

@@ -7,10 +7,10 @@
 	"defaultSender": "默认发件人ID（可选）",
 	"defaultSenderHelp": "最多11个字母数字或16个数字字符。空 = seven.io账户默认值。字母数字ID（如'我的公司'）无法直接接收回复——使用下方的共享号码池，或在此输入自己租用的号码（数字）以实现永久接收。",
 	"headerInbound": "接收短信与回复",
-	"defaultGetReplies": "默认启用回复（共享号码池，免费）",
-	"defaultGetRepliesHelp": "seven.io临时分配共享号码池中的号码作为发件人，使收件人可在48小时内回复。与上方的发件人ID无关。无需自己的号码。适用于DE、AT、CH、US、PL。2周内seven.io会尝试重用同一号码——不保证。",
+	"defaultGetReplies": "通过共享号码池回复（免费，无需自己的号码）",
+	"defaultGetRepliesInfo": "ℹ️ seven.io临时分配共享号码池中的号码作为发件人——收件人可在48小时内回复。适用于DE、AT、CH、US、PL。2周内seven.io会尝试重用同一号码——不保证。",
 	"inboundInterval": "接收轮询间隔（分钟，0=关闭）",
-	"inboundIntervalHelp": "检查接收短信的频率。适用于两种选项：共享号码池回复（启用"启用回复"时）和自己租用的接收号码（约20欧元/月）。设为0禁用轮询。",
+	"inboundIntervalHelp": "检查接收短信的频率。适用于两种选项：共享号码池回复（启用共享池选项时）和自己租用的接收号码（约20欧元/月）。设为0禁用轮询。",
 	"headerPricing": "价格与统计",
 	"pricingCountry": "价格查询国家代码（如DE、US）",
 	"pricingCountryHelp": "ISO国家代码用于筛选价格数据。留空显示所有国家。"

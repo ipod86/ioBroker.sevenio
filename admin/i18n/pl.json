@@ -7,11 +7,11 @@
 	"defaultSender": "Domyślny ID nadawcy (opcjonalnie)",
 	"defaultSenderHelp": "Maks. 11 znaków alfanumerycznych lub 16 cyfr. Puste = domyślne seven.io. Alfanumeryczne ID (np. 'MojaFirma') nie mogą odbierać odpowiedzi bezpośrednio — użyj wspólnej puli poniżej lub wprowadź tutaj własny wynajęty numer (numeryczny) dla stałego inboundu.",
 	"headerInbound": "Przychodzące SMS i odpowiedzi",
-	"defaultGetReplies": "Włącz odpowiedzi domyślnie (pula wspólna, bezpłatnie)",
-	"defaultGetRepliesHelp": "seven.io tymczasowo przypisuje numer wspólnej puli jako nadawcę, aby odbiorcy mogli odpowiadać w ciągu 48 godz. Działa niezależnie od ID nadawcy powyżej. Własny numer nie jest wymagany. Dostępne dla DE, AT, CH, US, PL. W ciągu 2 tygodni seven.io próbuje ponownie użyć tego samego numeru — bez gwarancji.",
+	"defaultGetReplies": "Odpowiedzi przez wspólną pulę (bezpłatnie, bez własnego numeru)",
 	"inboundInterval": "Interwał polling przychodzących (minuty, 0 = wył.)",
 	"inboundIntervalHelp": "Jak często sprawdzać przychodzące SMS. Działa dla obu opcji: odpowiedzi przez wspólną pulę (gdy 'Włącz odpowiedzi' jest włączone) i własny wynajęty numer inbound (~20 €/mies.). Ustaw 0, aby wyłączyć.",
 	"headerPricing": "Ceny & statystyki",
 	"pricingCountry": "Kod kraju dla cen (np. DE, US)",
-	"pricingCountryHelp": "Kod ISO kraju do filtrowania danych cenowych. Pozostaw puste dla wszystkich krajów."
+	"pricingCountryHelp": "Kod ISO kraju do filtrowania danych cenowych. Pozostaw puste dla wszystkich krajów.",
+	"defaultGetRepliesInfo": "ℹ️ seven.io tymczasowo przypisuje numer wspólnej puli jako nadawcę — odbiorcy mogą odpowiadać w ciągu 48 godz. Dostępne dla DE, AT, CH, US, PL. W ciągu 2 tygodni seven.io próbuje ponownie użyć tego samego numeru — bez gwarancji."
 }

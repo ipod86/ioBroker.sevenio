@@ -7,11 +7,11 @@
 	"defaultSender": "Default Sender ID (optional)",
 	"defaultSenderHelp": "Max. 11 alphanumeric or 16 numeric characters. Leave empty to use the seven.io account default. Alphanumeric IDs (e.g. 'MyCompany') cannot receive replies directly — use the shared pool option below, or enter your own rented number (numeric) here for permanent inbound.",
 	"headerInbound": "Inbound SMS & Replies",
-	"defaultGetReplies": "Enable replies by default (shared pool, free)",
-	"defaultGetRepliesHelp": "seven.io temporarily assigns a shared pool number as sender so recipients can reply within 48 h. Works regardless of the sender ID above. No own number needed. Available for DE, AT, CH, US, PL. seven.io tries to reuse the same pool number within 2 weeks — not guaranteed.",
+	"defaultGetReplies": "Replies via shared pool (free, no own number)",
 	"inboundInterval": "Inbound polling interval (minutes, 0 = off)",
 	"inboundIntervalHelp": "How often to check for incoming SMS. Works for both options: shared pool replies (when 'Enable replies' is on) and your own rented inbound number (~€20/month). Set to 0 to disable polling.",
 	"headerPricing": "Pricing & Statistics",
 	"pricingCountry": "Country code for pricing (e.g. DE, US)",
-	"pricingCountryHelp": "ISO country code to filter pricing data. Leave empty to load prices for all countries."
+	"pricingCountryHelp": "ISO country code to filter pricing data. Leave empty to load prices for all countries.",
+	"defaultGetRepliesInfo": "ℹ️ seven.io temporarily assigns a shared pool number as sender — recipients can reply within 48 h. Available for DE, AT, CH, US, PL. seven.io tries to reuse the same number within 2 weeks, but this is not guaranteed."
 }

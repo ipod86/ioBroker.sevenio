@@ -7,11 +7,11 @@
 	"defaultSender": "ID de remetente padrão (opcional)",
 	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos ou 16 numéricos. Vazio = padrão seven.io. IDs alfanuméricos (ex. 'MinhaEmpresa') não podem receber respostas diretamente — use o pool compartilhado abaixo, ou insira aqui seu próprio número alugado (numérico) para inbound permanente.",
 	"headerInbound": "SMS recebidos & respostas",
-	"defaultGetReplies": "Ativar respostas por padrão (pool compartilhado, gratuito)",
-	"defaultGetRepliesHelp": "seven.io atribui temporariamente um número de pool compartilhado como remetente para que os destinatários possam responder em 48 h. Funciona independentemente do ID de remetente acima. Sem número próprio necessário. Disponível para DE, AT, CH, US, PL. Em 2 semanas o seven.io tenta reutilizar o mesmo número — sem garantia.",
+	"defaultGetReplies": "Respostas via pool compartilhado (gratuito, sem número próprio)",
 	"inboundInterval": "Intervalo de polling de entrada (minutos, 0 = desativ.)",
 	"inboundIntervalHelp": "Com que frequência verificar SMS recebidos. Funciona para ambas as opções: respostas via pool compartilhado (se 'Ativar respostas' estiver ativo) e número de entrada próprio alugado (~20 €/mês). Definir 0 para desativar.",
 	"headerPricing": "Preços & estatísticas",
 	"pricingCountry": "Código de país para preços (ex. DE, US)",
-	"pricingCountryHelp": "Código ISO do país para filtrar dados de preços. Deixe vazio para todos os países."
+	"pricingCountryHelp": "Código ISO do país para filtrar dados de preços. Deixe vazio para todos os países.",
+	"defaultGetRepliesInfo": "ℹ️ seven.io atribui temporariamente um número de pool compartilhado como remetente — os destinatários podem responder em 48 h. Disponível para DE, AT, CH, US, PL. Em 2 semanas o seven.io tenta reutilizar o mesmo número — sem garantia."
 }
