@@ -278,6 +278,9 @@ Der Datenpunkt `sms.lastStatus` enthält eine lesbare Übersetzung des seven.io-
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.2 (2026-07-22)
+* (ipod86) Wartung: io-package.json-Struktur korrigiert, CI- und Dependabot-Konfiguration verbessert
+
 ### 0.1.1 (2026-07-22)
 * (ipod86) Fix: Mehrere eingehende SMS pro Poll-Zyklus lösen nun jeweils eine eigene Automatisierung aus (Verarbeitung von ältester zu neuester)
 

@@ -278,6 +278,9 @@ The `sms.lastStatus` state contains a human-readable translation of the seven.io
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.2 (2026-07-22)
+* (ipod86) Maintenance: fix io-package.json structure, improve CI and dependabot configuration
+
 ### 0.1.1 (2026-07-22)
 * (ipod86) Fix: multiple inbound SMS per poll cycle now each trigger automations (processed oldest-first)
 

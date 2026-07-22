@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "sevenio",
-		"version": "0.1.1",
+		"version": "0.1.2",
 		"news": {
+			"0.1.2": {
+				"en": "Maintenance: fix io-package.json structure, improve CI and dependabot configuration",
+				"de": "Wartung: io-package.json-Struktur korrigiert, CI- und Dependabot-Konfiguration verbessert",
+				"ru": "Обслуживание: исправлена структура io-package.json, улучшены CI и dependabot",
+				"pt": "Manutenção: estrutura io-package.json corrigida, configurações de CI e dependabot melhoradas",
+				"nl": "Onderhoud: io-package.json structuur gecorrigeerd, CI en dependabot configuratie verbeterd",
+				"fr": "Maintenance: structure io-package.json corrigée, configuration CI et dependabot améliorée",
+				"it": "Manutenzione: struttura io-package.json corretta, configurazione CI e dependabot migliorata",
+				"es": "Mantenimiento: estructura io-package.json corregida, configuración de CI y dependabot mejorada",
+				"pl": "Konserwacja: poprawiono strukturę io-package.json, ulepszono konfigurację CI i dependabot",
+				"uk": "Обслуговування: виправлено структуру io-package.json, покращено конфігурацію CI та dependabot",
+				"zh-cn": "维护：修复 io-package.json 结构，改进 CI 和 dependabot 配置"
+			},
 			"0.1.1": {
 				"en": "Fix: multiple inbound SMS per poll cycle now each trigger automations",
 				"de": "Fix: Mehrere eingehende SMS pro Poll-Zyklus lösen nun jeweils eine eigene Automatisierung aus",
