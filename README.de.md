@@ -47,8 +47,7 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 | Einstellung | Beschreibung | Standard |
 |---|---|---|
 | **API-Key** | Dein seven.io API-Key | *(erforderlich)* |
-| **Standard-Absender-ID** | Absendername oder -nummer für Empfänger. Max. 11 alphanumerische **oder** 16 numerische Zeichen. Hinweis: Alphanumerische Absender-IDs können keine direkten SMS-Antworten empfangen. **„Antworten aktivieren"** einschalten, um stattdessen eine Pool-Nummer als Absender zu verwenden — Antworten sind dann möglich, unabhängig von dieser Einstellung. Leer lassen = seven.io-Kontovorgabe. | *(leer)* |
-| **Antworten standardmäßig aktivieren** | Wenn aktiv, werden SMS über eine geteilte Poolnummer versandt, damit Empfänger antworten können. Details unter [Eingehende SMS](#eingehende-sms). | `aus` |
+| **Standard-Absender-ID** | Absendername oder -nummer für Empfänger. Max. 11 alphanumerische **oder** 16 numerische Zeichen. Leer lassen = seven.io-Kontovorgabe. Für Antworten `getReplies: true` pro Nachricht setzen (Blockly-Checkbox oder `sendTo()`) — Details unter [Eingehende SMS](#eingehende-sms). | *(leer)* |
 | **Kontostand-Intervall** | Wie oft (in Minuten) der Adapter den Kontostand abfragt | `30` |
 | **Inbound-Intervall** | Wie oft (in Minuten) der Adapter neue eingehende SMS prüft. `0` = deaktiviert. | `0` |
 | **Ländercode für Preisabfrage** | ISO-Ländercode (z. B. `DE`, `US`) zum Laden der SMS-Preise nur für dieses Land. Leer lassen = alle Länder. | *(leer)* |
@@ -87,7 +86,7 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 | `sms.from` | string | rw | Absender-ID überschreiben — leer = Standardwert aus den Einstellungen |
 | `sms.text` | string | rw | Nachrichtentext (max. 1520 Zeichen / ~10 SMS-Teile) |
 | `sms.flash` | boolean | rw | Als Flash-SMS senden (erscheint direkt auf dem Display) |
-| `sms.getReplies` | boolean | rw | Antworten via Shared Pool aktivieren — überschreibt die Standardeinstellung |
+| `sms.getReplies` | boolean | rw | Shared Pool aktivieren damit Empfänger antworten kann — opt-in pro Nachricht, Standard `false` |
 | `sms.send` | boolean | rw | Auf `true` setzen → Versand auslösen — wird automatisch auf `false` zurückgesetzt |
 | `sms.lastResult` | string (JSON) | r | Vollständige API-Antwort des letzten Versands, inkl. `statusText` |
 | `sms.lastStatus` | string | r | Lesbarer Status des letzten Versands (z. B. `Success`, `Insufficient credits`) |
@@ -134,13 +133,11 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 
 ## Eingehende SMS
 
-Um SMS-Antworten empfangen zu können, wird eine **numerische Absender-Rufnummer** benötigt — alphanumerische Namen (z. B. `MeineFirma`) können keine direkten Antworten empfangen. Mit aktiviertem „Antworten aktivieren" verwendet seven.io automatisch eine Pool-Nummer als Absender, sodass Antworten auch mit alphanumerischer Absender-ID möglich sind.
-
-Es gibt zwei Optionen:
+Um SMS-Antworten empfangen zu können, wird eine **numerische Absender-Rufnummer** benötigt — alphanumerische Namen (z. B. `MeineFirma`) können keine direkten Antworten empfangen. Es gibt zwei Optionen:
 
 ### Option 1 — Shared Pool (kostenlos, zum Testen und leichtem Betrieb)
 
-**Antworten aktivieren** in den Einstellungen einschalten, oder `getReplies: true` beim Versand übergeben. seven.io weist dann automatisch eine temporäre geteilte Poolnummer als Absender zu.
+`getReplies: true` pro Nachricht setzen (Blockly-Checkbox oder `sendTo()`-Parameter). seven.io weist dann automatisch eine temporäre geteilte Poolnummer als Absender zu, sodass Antworten auch mit alphanumerischer Absender-ID möglich sind.
 
 | | |
 |---|---|
@@ -172,9 +169,10 @@ Nach der Installation erscheint in der ioBroker-Blockly-Oberfläche ein fertiger
 
 ```
 ┌─ seven.io  |  SMS ☑  Anruf ☐ ──────────────────┐
-│  Empfänger  [ "+491234567890"             ]      │
-│  Nachricht  [ "Alarm im Wohnzimmer"       ]      │
-│  Flash-SMS ☐                                     │
+│  Absender (optional)  [ ""                ]      │
+│  Empfänger            [ "+491234567890"   ]      │
+│  Nachricht            [ "Alarm!"          ]      │
+│  Flash-SMS ☐  Antworten (Shared Pool) ☐         │
 │  Klingelzeit (s)  30                             │
 │  Instanz  sevenio.0 ▼                            │
 └──────────────────────────────────────────────────┘
@@ -183,6 +181,7 @@ Nach der Installation erscheint in der ioBroker-Blockly-Oberfläche ein fertiger
 - **SMS** anhaken → Textnachricht versenden
 - **Anruf** anhaken → automatisierten TTS-Anruf starten
 - **Beide** anhaken → SMS senden und gleichzeitig anrufen (parallel, ohne zusätzliche Verzögerung)
+- **Antworten (Shared Pool)** — wenn aktiviert, verwendet seven.io eine Poolnummer als Absender damit der Empfänger antworten kann (siehe [Eingehende SMS](#eingehende-sms))
 - Das Empfänger-Feld akzeptiert eine Telefonnummer oder einen Kontaktnamen aus der seven.io-Kontaktliste
 
 ---

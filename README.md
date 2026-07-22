@@ -47,8 +47,7 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | Setting | Description | Default |
 |---|---|---|
 | **API Key** | Your seven.io API key | *(required)* |
-| **Default Sender ID** | Sender name or number shown to recipients. Max 11 alphanumeric **or** 16 numeric characters. Note: alphanumeric sender IDs cannot directly receive SMS replies. Enable **"Enable replies"** to use a shared pool number as sender instead — replies are then possible regardless of this setting. Leave empty to use the seven.io account default. | *(empty)* |
-| **Enable replies by default** | When enabled, SMS are sent via a shared pool number so recipients can reply. See [Inbound SMS](#inbound-sms) for details. | `off` |
+| **Default Sender ID** | Sender name or number shown to recipients. Max 11 alphanumeric **or** 16 numeric characters. Leave empty to use the seven.io account default. To allow replies, use `getReplies: true` per message (Blockly or `sendTo()`) — see [Inbound SMS](#inbound-sms). | *(empty)* |
 | **Balance polling interval** | How often (in minutes) the adapter polls your account balance | `30` |
 | **Inbound SMS polling interval** | How often (in minutes) the adapter checks for new incoming SMS. Set to `0` to disable. | `0` |
 | **Country code for pricing** | ISO country code (e.g. `DE`, `US`) to load SMS pricing for that country only. Leave empty to load all countries. | *(empty)* |
@@ -87,7 +86,7 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | `sms.from` | string | rw | Sender ID override — empty = use default from settings |
 | `sms.text` | string | rw | Message text (max 1520 characters / ~10 SMS parts) |
 | `sms.flash` | boolean | rw | Send as flash SMS (message shown directly on screen) |
-| `sms.getReplies` | boolean | rw | Enable recipient replies via shared pool number — overrides the default from settings |
+| `sms.getReplies` | boolean | rw | Enable shared pool so recipient can reply — opt-in per message, default `false` |
 | `sms.send` | boolean | rw | Set to `true` to send — resets to `false` automatically |
 | `sms.lastResult` | string (JSON) | r | Full API response of the last send attempt, including `statusText` |
 | `sms.lastStatus` | string | r | Human-readable status of the last send (e.g. `Success`, `Insufficient credits`) |
@@ -134,13 +133,11 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 
 ## Inbound SMS
 
-To receive SMS replies you need a **numeric sender** — alphanumeric names (e.g. `MyCompany`) cannot directly receive replies. With **"Enable replies"** active, seven.io automatically uses a shared pool number as the sender, so replies work even with an alphanumeric sender ID.
-
-You have two options:
+To receive SMS replies you need a **numeric sender** — alphanumeric names (e.g. `MyCompany`) cannot directly receive replies. You have two options:
 
 ### Option 1 — Shared pool (free, for testing and light use)
 
-Enable **"Enable replies"** in the adapter settings or pass `getReplies: true` when sending. seven.io automatically assigns a temporary shared pool number as the sender.
+Pass `getReplies: true` per message (Blockly checkbox or `sendTo()` parameter). seven.io automatically assigns a temporary shared pool number as the sender, so replies work even with an alphanumeric sender ID.
 
 | | |
 |---|---|
@@ -172,9 +169,10 @@ After installing the adapter a ready-to-use block appears in the **sendTo** cate
 
 ```
 ┌─ seven.io  |  SMS ☑  Voice call ☐ ─────────────┐
-│  recipient   [ "+491234567890"            ]      │
-│  message     [ "Alarm in the living room" ]      │
-│  flash SMS ☐                                     │
+│  sender (optional)  [ ""                  ]      │
+│  recipient          [ "+491234567890"     ]      │
+│  message            [ "Alarm!"            ]      │
+│  flash SMS ☐  replies (shared pool) ☐           │
 │  ring time (s)  30                               │
 │  instance  sevenio.0 ▼                           │
 └──────────────────────────────────────────────────┘
@@ -183,6 +181,7 @@ After installing the adapter a ready-to-use block appears in the **sendTo** cate
 - Check **SMS** to send a text message
 - Check **Voice call** to trigger an automated TTS call
 - Check **both** to send an SMS and make a call at the same time (parallel, no extra delay)
+- **replies (shared pool)** — when checked, seven.io uses a shared pool number as sender so the recipient can reply (see [Inbound SMS](#inbound-sms))
 - The **recipient** input accepts a phone number or a contact name from your seven.io contact list
 
 ---
