@@ -2,7 +2,7 @@
 	"sevenio adapter settings": "seven.io adapter instellingen",
 	"apiKey": "API-sleutel",
 	"defaultSender": "Standaard afzender-ID (optioneel)",
-	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Belangrijk: alfanumerieke afzenders (bijv. 'MijnBedrijf') kunnen technisch geen SMS-antwoorden ontvangen — alleen numerieke telefoonnummers staan inkomende SMS toe.",
+	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Opmerking: alfanumerieke afzenders (bijv. 'MijnBedrijf') kunnen geen directe SMS-antwoorden ontvangen. Schakel 'Antwoorden inschakelen' hieronder in om een gedeeld poolnummer als afzender te gebruiken — antwoorden zijn dan mogelijk ongeacht deze instelling.",
 	"defaultGetReplies": "Antwoorden standaard inschakelen (gedeelde pool)",
 	"defaultGetRepliesHelp": "Indien ingeschakeld worden SMS verstuurd via een tijdelijk gedeeld poolnummer zodat ontvangers kunnen antwoorden. Antwoorden komen binnen 48 uur aan. Binnen 2 weken probeert seven.io hetzelfde nummer toe te wijzen — zonder garantie. Gratis, geen eigen nummer vereist. Beschikbaar voor DE, AT, CH, US, PL.",
 	"balanceInterval": "Saldo-polling interval (minuten)",

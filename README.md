@@ -47,7 +47,7 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | Setting | Description | Default |
 |---|---|---|
 | **API Key** | Your seven.io API key | *(required)* |
-| **Default Sender ID** | Sender name or number shown to recipients. Max 11 alphanumeric **or** 16 numeric characters. **Alphanumeric sender IDs cannot receive SMS replies** — only numeric phone numbers or a pool number allow inbound SMS. Leave empty to use the seven.io account default. | *(empty)* |
+| **Default Sender ID** | Sender name or number shown to recipients. Max 11 alphanumeric **or** 16 numeric characters. Note: alphanumeric sender IDs cannot directly receive SMS replies. Enable **"Enable replies"** to use a shared pool number as sender instead — replies are then possible regardless of this setting. Leave empty to use the seven.io account default. | *(empty)* |
 | **Enable replies by default** | When enabled, SMS are sent via a shared pool number so recipients can reply. See [Inbound SMS](#inbound-sms) for details. | `off` |
 | **Balance polling interval** | How often (in minutes) the adapter polls your account balance | `30` |
 | **Inbound SMS polling interval** | How often (in minutes) the adapter checks for new incoming SMS. Set to `0` to disable. | `0` |
@@ -134,7 +134,7 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 
 ## Inbound SMS
 
-To receive SMS replies you need a **numeric sender** — alphanumeric names (e.g. `MyCompany`) cannot receive replies (technically impossible).
+To receive SMS replies you need a **numeric sender** — alphanumeric names (e.g. `MyCompany`) cannot directly receive replies. With **"Enable replies"** active, seven.io automatically uses a shared pool number as the sender, so replies work even with an alphanumeric sender ID.
 
 You have two options:
 

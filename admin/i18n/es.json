@@ -2,7 +2,7 @@
 	"sevenio adapter settings": "Configuración del adaptador seven.io",
 	"apiKey": "Clave API",
 	"defaultSender": "ID de remitente predeterminado (opcional)",
-	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos o 16 numéricos. Vacío = predeterminado seven.io. Importante: los remitentes alfanuméricos (ej. 'MiEmpresa') no pueden recibir respuestas SMS — solo los números de teléfono permiten SMS entrantes.",
+	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos o 16 numéricos. Vacío = predeterminado seven.io. Nota: los remitentes alfanuméricos (ej. 'MiEmpresa') no pueden recibir directamente respuestas SMS. Activa 'Habilitar respuestas' a continuación para usar un número de pool compartido como remitente — las respuestas son entonces posibles independientemente de este ajuste.",
 	"defaultGetReplies": "Habilitar respuestas por defecto (pool compartido)",
 	"defaultGetRepliesHelp": "Si está habilitado, los SMS se envían mediante un número de pool temporal compartido para que los destinatarios puedan responder. Las respuestas llegan en 48 horas. En 2 semanas seven.io intenta asignar el mismo número — sin garantía. Gratuito, sin número propio necesario. Disponible para DE, AT, CH, US, PL.",
 	"balanceInterval": "Intervalo de consulta de saldo (minutos)",

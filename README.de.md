@@ -47,7 +47,7 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 | Einstellung | Beschreibung | Standard |
 |---|---|---|
 | **API-Key** | Dein seven.io API-Key | *(erforderlich)* |
-| **Standard-Absender-ID** | Absendername oder -nummer für Empfänger. Max. 11 alphanumerische **oder** 16 numerische Zeichen. **Alphanumerische Absender-IDs können keine SMS-Antworten empfangen** — nur numerische Rufnummern oder eine Poolnummer erlauben Inbound-SMS. Leer lassen = seven.io-Kontovorgabe. | *(leer)* |
+| **Standard-Absender-ID** | Absendername oder -nummer für Empfänger. Max. 11 alphanumerische **oder** 16 numerische Zeichen. Hinweis: Alphanumerische Absender-IDs können keine direkten SMS-Antworten empfangen. **„Antworten aktivieren"** einschalten, um stattdessen eine Pool-Nummer als Absender zu verwenden — Antworten sind dann möglich, unabhängig von dieser Einstellung. Leer lassen = seven.io-Kontovorgabe. | *(leer)* |
 | **Antworten standardmäßig aktivieren** | Wenn aktiv, werden SMS über eine geteilte Poolnummer versandt, damit Empfänger antworten können. Details unter [Eingehende SMS](#eingehende-sms). | `aus` |
 | **Kontostand-Intervall** | Wie oft (in Minuten) der Adapter den Kontostand abfragt | `30` |
 | **Inbound-Intervall** | Wie oft (in Minuten) der Adapter neue eingehende SMS prüft. `0` = deaktiviert. | `0` |
@@ -134,7 +134,7 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 
 ## Eingehende SMS
 
-Um SMS-Antworten empfangen zu können, ist eine **numerische Absender-Rufnummer** nötig — alphanumerische Namen (z. B. `MeinFirma`) können technisch keine Antworten empfangen.
+Um SMS-Antworten empfangen zu können, wird eine **numerische Absender-Rufnummer** benötigt — alphanumerische Namen (z. B. `MeineFirma`) können keine direkten Antworten empfangen. Mit aktiviertem „Antworten aktivieren" verwendet seven.io automatisch eine Pool-Nummer als Absender, sodass Antworten auch mit alphanumerischer Absender-ID möglich sind.
 
 Es gibt zwei Optionen:
 

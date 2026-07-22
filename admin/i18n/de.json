@@ -2,7 +2,7 @@
 	"sevenio adapter settings": "seven.io Adapter-Einstellungen",
 	"apiKey": "API-Schlüssel",
 	"defaultSender": "Standard-Absender-ID (optional)",
-	"defaultSenderHelp": "Max. 11 alphanumerische oder 16 numerische Zeichen. Leer = Kontovorgabe seven.io. Wichtig: Alphanumerische Absender (z. B. 'MeinFirma') können technisch keine SMS-Antworten empfangen — nur Rufnummern (numerisch) ermöglichen Inbound-SMS.",
+	"defaultSenderHelp": "Max. 11 alphanumerische oder 16 numerische Zeichen. Leer = Kontovorgabe seven.io. Hinweis: Alphanumerische Absender (z. B. 'MeineFirma') können keine direkten SMS-Antworten empfangen. 'Antworten aktivieren' einschalten, um stattdessen eine Pool-Nummer als Absender zu verwenden — dann sind Antworten möglich, unabhängig von dieser Einstellung.",
 	"defaultGetReplies": "Antworten standardmäßig aktivieren (Shared Pool)",
 	"defaultGetRepliesHelp": "Wenn aktiviert, werden SMS über eine temporäre geteilte Rufnummer versandt, damit Empfänger antworten können. Antworten kommen innerhalb von 48 Stunden an. Innerhalb von 2 Wochen versucht seven.io, dieselbe Poolnummer zuzuteilen — ohne Garantie. Kostenlos, keine eigene Nummer nötig. Verfügbar für DE, AT, CH, US, PL.",
 	"balanceInterval": "Kontostand-Abfrageintervall (Minuten)",
