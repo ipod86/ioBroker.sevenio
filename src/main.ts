@@ -501,6 +501,18 @@ class Sevenio extends utils.Adapter {
 				{ name: 'Last pricing update', type: 'string', role: 'date', read: true, write: false, def: '' },
 			],
 			[
+				'pricing.price',
+				{
+					name: 'SMS price for configured country',
+					type: 'number',
+					role: 'value',
+					unit: '€',
+					read: true,
+					write: false,
+					def: 0,
+				},
+			],
+			[
 				'pricing.refresh',
 				{ name: 'Refresh pricing', type: 'boolean', role: 'button', read: false, write: true, def: false },
 			],
@@ -973,9 +985,15 @@ class Sevenio extends utils.Adapter {
 			if (this.cfg.pricingCountry) {
 				params.country = this.cfg.pricingCountry.toLowerCase();
 			}
-			const res = await this.apiGet('/pricing', Object.keys(params).length ? params : undefined);
+			const res = (await this.apiGet('/pricing', Object.keys(params).length ? params : undefined)) as {
+				countries?: { networks?: { price: number }[] }[];
+			};
 			await this.setState('pricing.json', { val: JSON.stringify(res), ack: true });
 			await this.setState('pricing.lastUpdate', { val: new Date().toISOString(), ack: true });
+			if (this.cfg.pricingCountry) {
+				const price = res.countries?.[0]?.networks?.[0]?.price ?? 0;
+				await this.setState('pricing.price', { val: price, ack: true });
+			}
 			this.log.debug('Pricing data fetched');
 		} catch (e) {
 			this.log.warn(`Pricing fetch failed: ${(e as Error).message}`);

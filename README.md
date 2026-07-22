@@ -115,6 +115,7 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | State | Type | Description |
 |---|---|---|
 | `pricing.json` | string (JSON) | Full pricing data from seven.io — per-network SMS prices for the configured country or all countries |
+| `pricing.price` | number (€) | SMS price for the configured country — only set when a country code is configured |
 | `pricing.lastUpdate` | string | ISO timestamp of the last pricing fetch |
 | `pricing.refresh` | boolean | Set to `true` to refresh pricing data immediately |
 
