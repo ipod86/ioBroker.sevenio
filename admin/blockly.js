@@ -125,7 +125,7 @@ Blockly.Sendto.blocks['sevenio_send'] =
     '  </value>' +
     '  <value name="TEXT">' +
     '    <shadow type="text">' +
-    '      <field name="TEXT">Nachricht</field>' +
+    '      <field name="TEXT">Hello</field>' +
     '    </shadow>' +
     '  </value>' +
     '</block>';

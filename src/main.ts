@@ -562,7 +562,7 @@ class Sevenio extends utils.Adapter {
 		if (this._stopped) {
 			return;
 		}
-		const intervalMs = Math.max(1, this.cfg.balanceInterval ?? 30) * 60_000;
+		const intervalMs = Math.min(35791, Math.max(1, this.cfg.balanceInterval ?? 30)) * 60_000;
 		this._balanceTimer = this.setTimeout(async () => {
 			this._balanceTimer = null;
 			if (this._stopped) {
@@ -595,7 +595,7 @@ class Sevenio extends utils.Adapter {
 		if (this._stopped) {
 			return;
 		}
-		const intervalMs = Math.max(1, this.cfg.inboundInterval) * 60_000;
+		const intervalMs = Math.min(35791, Math.max(1, this.cfg.inboundInterval)) * 60_000;
 		this._inboundTimer = this.setTimeout(async () => {
 			this._inboundTimer = null;
 			if (this._stopped) {

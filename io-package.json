@@ -85,6 +85,8 @@
 		"inboundInterval": 0,
 		"pricingCountry": ""
 	},
+	"protectedNative": ["apiKey"],
+	"encryptedNative": ["apiKey"],
 	"objects": [],
 	"instanceObjects": [
 		{
