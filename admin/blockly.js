@@ -36,6 +36,12 @@ Blockly.Words['sevenio_to'] = {
     nl: 'ontvanger',     fr: 'destinataire', it: 'destinatario', es: 'destinatario',
     pl: 'odbiorca',      uk: 'одержувач',    'zh-cn': '收件人',
 };
+Blockly.Words['sevenio_from'] = {
+    en: 'sender (optional)',  de: 'Absender (optional)',  ru: 'отправитель (необязательно)',
+    pt: 'remetente (opcional)', nl: 'afzender (optioneel)', fr: 'expéditeur (optionnel)',
+    it: 'mittente (opzionale)', es: 'remitente (opcional)', pl: 'nadawca (opcjonalnie)',
+    uk: 'відправник (необов\'язково)', 'zh-cn': '发件人（可选）',
+};
 Blockly.Words['sevenio_text'] = {
     en: 'message',      de: 'Nachricht',    ru: 'сообщение',    pt: 'mensagem',
     nl: 'bericht',      fr: 'message',      it: 'messaggio',    es: 'mensaje',
@@ -93,6 +99,11 @@ Blockly.Sendto.blocks['sevenio_send'] =
     '  <field name="SEND_VOICE">FALSE</field>' +
     '  <field name="FLASH">FALSE</field>' +
     '  <field name="RINGTIME">30</field>' +
+    '  <value name="FROM">' +
+    '    <shadow type="text">' +
+    '      <field name="TEXT"></field>' +
+    '    </shadow>' +
+    '  </value>' +
     '  <value name="TO">' +
     '    <shadow type="text">' +
     '      <field name="TEXT">+491234567890</field>' +
@@ -134,6 +145,10 @@ Blockly.Blocks['sevenio_send'] = {
             .appendField('  ' + Blockly.Translate('sevenio_voice'))
             .appendField(new Blockly.FieldCheckbox('FALSE'), 'SEND_VOICE');
 
+        this.appendValueInput('FROM')
+            .setCheck('String')
+            .appendField(Blockly.Translate('sevenio_from'));
+
         this.appendValueInput('TO')
             .setCheck('String')
             .appendField(Blockly.Translate('sevenio_to'));
@@ -166,16 +181,17 @@ Blockly.JavaScript['sevenio_send'] = function (block) {
     const sendVoice = block.getFieldValue('SEND_VOICE') === 'TRUE';
     const flash     = block.getFieldValue('FLASH')      === 'TRUE';
     const ringtime  = parseInt(block.getFieldValue('RINGTIME'), 10);
+    const from = Blockly.JavaScript.valueToCode(block, 'FROM', Blockly.JavaScript.ORDER_ATOMIC) || "''";
     const to   = Blockly.JavaScript.valueToCode(block, 'TO',   Blockly.JavaScript.ORDER_ATOMIC) || "''";
     const text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC) || "''";
 
     const target = `'sevenio${instance}'`;
     const lines = [];
     if (sendSms) {
-        lines.push(`sendTo(${target}, 'send', { to: ${to}, text: ${text}, flash: ${flash} });`);
+        lines.push(`sendTo(${target}, 'send', { to: ${to}, text: ${text}, from: ${from}, flash: ${flash} });`);
     }
     if (sendVoice) {
-        lines.push(`sendTo(${target}, 'voice', { to: ${to}, text: ${text}, ringtime: ${ringtime} });`);
+        lines.push(`sendTo(${target}, 'voice', { to: ${to}, text: ${text}, from: ${from}, ringtime: ${ringtime} });`);
     }
     return lines.join('\n') + '\n';
 };

@@ -53,32 +53,17 @@ function smsStatusText(result) {
   return (_a = SMS_STATUS[code]) != null ? _a : `Unknown status ${code}`;
 }
 const VOICE_STATUS = {
-  0: "Success",
-  100: "Invalid recipient number",
+  100: "Success",
+  301: "Call failed",
   500: "Unknown error"
 };
 function voiceStatusText(result) {
   var _a;
-  let code;
-  if (typeof result === "number" || typeof result === "string") {
-    code = String(result);
-  } else if (typeof result === "object" && result !== null) {
-    const raw = result.success;
-    code = typeof raw === "string" || typeof raw === "number" ? String(raw) : "";
-  } else {
-    return "Unknown status";
-  }
+  const code = String(result.success);
   return (_a = VOICE_STATUS[code]) != null ? _a : `Unknown status ${code}`;
 }
 function voiceIsSuccess(result) {
-  if (typeof result === "number" || typeof result === "string") {
-    return String(result) === "0";
-  }
-  if (typeof result === "object" && result !== null) {
-    const s = result.success;
-    return s === true || s === 1 || s === "1" || String(s) === "0";
-  }
-  return true;
+  return result.success === 100;
 }
 function smsIsSuccess(result) {
   if (typeof result === "number" || typeof result === "string") {
@@ -176,15 +161,12 @@ class Sevenio extends utils.Adapter {
         const msg = obj.message;
         const smsOpts = { ...msg, to: this.resolveRecipient(msg.to) };
         void this.sendSms(smsOpts).then(async (result) => {
+          var _a, _b;
           const enriched = enrichSmsResult(result);
           await this.setState("sms.to", { val: msg.to, ack: true });
           await this.setState("sms.text", { val: smsOpts.text, ack: true });
-          if (smsOpts.from !== void 0) {
-            await this.setState("sms.from", { val: smsOpts.from, ack: true });
-          }
-          if (smsOpts.flash !== void 0) {
-            await this.setState("sms.flash", { val: smsOpts.flash, ack: true });
-          }
+          await this.setState("sms.from", { val: (_a = smsOpts.from) != null ? _a : "", ack: true });
+          await this.setState("sms.flash", { val: (_b = smsOpts.flash) != null ? _b : false, ack: true });
           const status = smsStatusText(enriched);
           if (smsIsSuccess(enriched)) {
             this.log.debug(`SMS to ${msg.to}: ${status}`);
@@ -201,14 +183,11 @@ class Sevenio extends utils.Adapter {
       case "voice": {
         const msg = obj.message;
         void this.sendVoice(msg).then(async (result) => {
+          var _a, _b;
           await this.setState("voice.to", { val: msg.to, ack: true });
           await this.setState("voice.text", { val: msg.text, ack: true });
-          if (msg.from !== void 0) {
-            await this.setState("voice.from", { val: msg.from, ack: true });
-          }
-          if (msg.ringtime !== void 0) {
-            await this.setState("voice.ringtime", { val: msg.ringtime, ack: true });
-          }
+          await this.setState("voice.from", { val: (_a = msg.from) != null ? _a : "", ack: true });
+          await this.setState("voice.ringtime", { val: (_b = msg.ringtime) != null ? _b : 30, ack: true });
           const vStatus = voiceStatusText(result);
           if (voiceIsSuccess(result)) {
             this.log.debug(`Voice call to ${msg.to}: ${vStatus}`);
@@ -242,270 +221,128 @@ class Sevenio extends utils.Adapter {
     }
   }
   async createObjectTree() {
-    await this.setObjectNotExistsAsync("account", {
-      type: "channel",
-      common: { name: "Account" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("account.balance", {
-      type: "state",
-      common: { name: "Balance", type: "number", role: "value", read: true, write: false, unit: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("account.currency", {
-      type: "state",
-      common: { name: "Currency", type: "string", role: "text", read: true, write: false },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("account.lastCheck", {
-      type: "state",
-      common: { name: "Last balance check", type: "string", role: "date", read: true, write: false },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts", {
-      type: "channel",
-      common: { name: "Contacts" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts.json", {
-      type: "state",
-      common: {
-        name: "All contacts (JSON)",
-        type: "string",
-        role: "json",
-        read: true,
-        write: false,
-        def: "[]"
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts.count", {
-      type: "state",
-      common: { name: "Number of contacts", type: "number", role: "value", read: true, write: false, def: 0 },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts.refresh", {
-      type: "state",
-      common: {
-        name: "Refresh contacts (set to true to trigger)",
-        type: "boolean",
-        role: "button",
-        read: true,
-        write: true,
-        def: false
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts.new", {
-      type: "channel",
-      common: { name: "New contact" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts.new.name", {
-      type: "state",
-      common: { name: "Name", type: "string", role: "text", read: true, write: true, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts.new.number", {
-      type: "state",
-      common: { name: "Phone number", type: "string", role: "text", read: true, write: true, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("contacts.new.save", {
-      type: "state",
-      common: {
-        name: "Save contact (set to true to create)",
-        type: "boolean",
-        role: "button",
-        read: true,
-        write: true,
-        def: false
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms", {
-      type: "channel",
-      common: { name: "SMS" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.to", {
-      type: "state",
-      common: { name: "Recipient", type: "string", role: "text", read: true, write: true, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.from", {
-      type: "state",
-      common: {
-        name: "Sender ID (empty = default)",
-        type: "string",
-        role: "text",
-        read: true,
-        write: true,
-        def: ""
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.text", {
-      type: "state",
-      common: { name: "Message text", type: "string", role: "text", read: true, write: true, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.flash", {
-      type: "state",
-      common: { name: "Flash SMS", type: "boolean", role: "switch", read: true, write: true, def: false },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.send", {
-      type: "state",
-      common: {
-        name: "Send SMS (set to true to trigger)",
-        type: "boolean",
-        role: "button",
-        read: true,
-        write: true,
-        def: false
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.lastResult", {
-      type: "state",
-      common: {
-        name: "Last send result (JSON)",
-        type: "string",
-        role: "json",
-        read: true,
-        write: false,
-        def: ""
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.lastStatus", {
-      type: "state",
-      common: {
-        name: "Last send status (text)",
-        type: "string",
-        role: "text",
-        read: true,
-        write: false,
-        def: ""
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.lastDelivery", {
-      type: "state",
-      common: {
-        name: "Last delivery status (JSON)",
-        type: "string",
-        role: "json",
-        read: true,
-        write: false,
-        def: ""
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.inbound", {
-      type: "channel",
-      common: { name: "Last received SMS" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.inbound.id", {
-      type: "state",
-      common: { name: "Message ID", type: "string", role: "text", read: true, write: false, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.inbound.from", {
-      type: "state",
-      common: { name: "Sender number", type: "string", role: "text", read: true, write: false, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.inbound.text", {
-      type: "state",
-      common: { name: "Message text", type: "string", role: "text", read: true, write: false, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("sms.inbound.timestamp", {
-      type: "state",
-      common: { name: "Received at", type: "string", role: "date", read: true, write: false, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice", {
-      type: "channel",
-      common: { name: "Voice" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice.to", {
-      type: "state",
-      common: { name: "Recipient", type: "string", role: "text", read: true, write: true, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice.from", {
-      type: "state",
-      common: { name: "Verified caller number", type: "string", role: "text", read: true, write: true, def: "" },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice.text", {
-      type: "state",
-      common: {
-        name: "Text to speak (or TwiML)",
-        type: "string",
-        role: "text",
-        read: true,
-        write: true,
-        def: ""
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice.ringtime", {
-      type: "state",
-      common: {
-        name: "Ring time in seconds (5-60)",
-        type: "number",
-        role: "value",
-        read: true,
-        write: true,
-        def: 30,
-        min: 5,
-        max: 60,
-        unit: "s"
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice.send", {
-      type: "state",
-      common: {
-        name: "Start call (set to true to trigger)",
-        type: "boolean",
-        role: "button",
-        read: true,
-        write: true,
-        def: false
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice.lastResult", {
-      type: "state",
-      common: {
-        name: "Last call result (JSON)",
-        type: "string",
-        role: "json",
-        read: true,
-        write: false,
-        def: ""
-      },
-      native: {}
-    });
-    await this.setObjectNotExistsAsync("voice.lastStatus", {
-      type: "state",
-      common: {
-        name: "Last call status (text)",
-        type: "string",
-        role: "text",
-        read: true,
-        write: false,
-        def: ""
-      },
-      native: {}
-    });
+    for (const [id, name] of [
+      ["account", "Account"],
+      ["contacts", "Contacts"],
+      ["contacts.new", "New contact"],
+      ["contacts.list", "Contact list"],
+      ["sms", "SMS"],
+      ["sms.inbound", "Last received SMS"],
+      ["voice", "Voice"]
+    ]) {
+      await this.setObjectNotExistsAsync(id, { type: "channel", common: { name }, native: {} });
+    }
+    const states = [
+      ["account.balance", { name: "Balance", type: "number", role: "value", read: true, write: false, unit: "" }],
+      ["account.currency", { name: "Currency", type: "string", role: "text", read: true, write: false }],
+      [
+        "account.lastCheck",
+        { name: "Last balance check", type: "string", role: "date", read: true, write: false }
+      ],
+      [
+        "contacts.json",
+        { name: "All contacts (JSON)", type: "string", role: "json", read: true, write: false, def: "[]" }
+      ],
+      [
+        "contacts.count",
+        { name: "Number of contacts", type: "number", role: "value", read: true, write: false, def: 0 }
+      ],
+      [
+        "contacts.refresh",
+        { name: "Refresh contacts", type: "boolean", role: "button", read: false, write: true, def: false }
+      ],
+      ["contacts.new.name", { name: "Name", type: "string", role: "text", read: true, write: true, def: "" }],
+      [
+        "contacts.new.number",
+        { name: "Phone number", type: "string", role: "text.phone", read: true, write: true, def: "" }
+      ],
+      [
+        "contacts.new.save",
+        { name: "Save contact", type: "boolean", role: "button", read: false, write: true, def: false }
+      ],
+      ["sms.to", { name: "Recipient", type: "string", role: "text.phone", read: true, write: true, def: "" }],
+      [
+        "sms.from",
+        { name: "Sender ID (empty = default)", type: "string", role: "text", read: true, write: true, def: "" }
+      ],
+      ["sms.text", { name: "Message text", type: "string", role: "text", read: true, write: true, def: "" }],
+      ["sms.flash", { name: "Flash SMS", type: "boolean", role: "switch", read: true, write: true, def: false }],
+      ["sms.send", { name: "Send SMS", type: "boolean", role: "button", read: false, write: true, def: false }],
+      [
+        "sms.lastResult",
+        { name: "Last send result (JSON)", type: "string", role: "json", read: true, write: false, def: "" }
+      ],
+      [
+        "sms.lastStatus",
+        { name: "Last send status", type: "string", role: "text", read: true, write: false, def: "" }
+      ],
+      [
+        "sms.lastDelivery",
+        {
+          name: "Last delivery status (JSON)",
+          type: "string",
+          role: "json",
+          read: true,
+          write: false,
+          def: ""
+        }
+      ],
+      ["sms.inbound.id", { name: "Message ID", type: "string", role: "text", read: true, write: false, def: "" }],
+      [
+        "sms.inbound.from",
+        { name: "Sender number", type: "string", role: "text.phone", read: true, write: false, def: "" }
+      ],
+      [
+        "sms.inbound.text",
+        { name: "Message text", type: "string", role: "text", read: true, write: false, def: "" }
+      ],
+      [
+        "sms.inbound.timestamp",
+        { name: "Received at", type: "string", role: "date", read: true, write: false, def: "" }
+      ],
+      ["voice.to", { name: "Recipient", type: "string", role: "text.phone", read: true, write: true, def: "" }],
+      [
+        "voice.from",
+        {
+          name: "Verified caller number",
+          type: "string",
+          role: "text.phone",
+          read: true,
+          write: true,
+          def: ""
+        }
+      ],
+      ["voice.text", { name: "Text to speak", type: "string", role: "text", read: true, write: true, def: "" }],
+      [
+        "voice.ringtime",
+        {
+          name: "Ring time in seconds (5-60)",
+          type: "number",
+          role: "level",
+          read: true,
+          write: true,
+          def: 30,
+          min: 5,
+          max: 60,
+          unit: "s"
+        }
+      ],
+      [
+        "voice.send",
+        { name: "Start call", type: "boolean", role: "button", read: false, write: true, def: false }
+      ],
+      [
+        "voice.lastResult",
+        { name: "Last call result (JSON)", type: "string", role: "json", read: true, write: false, def: "" }
+      ],
+      [
+        "voice.lastStatus",
+        { name: "Last call status", type: "string", role: "text", read: true, write: false, def: "" }
+      ]
+    ];
+    for (const [id, common] of states) {
+      await this.extendObjectAsync(id, { type: "state", common, native: {} });
+    }
   }
   async validateConnection() {
     try {
@@ -576,7 +413,13 @@ class Sevenio extends utils.Adapter {
     if (newMessages.length === 0) {
       return;
     }
-    this.log.info(`${newMessages.length} new inbound SMS received`);
+    for (const m of newMessages) {
+      const preview = m.text.length > 60 ? `${m.text.substring(0, 60)}\u2026` : m.text;
+      this.log.info(`Inbound SMS from ${m.from}: ${preview}`);
+    }
+    if (newMessages.length > 1) {
+      this.log.info(`${newMessages.length} new inbound messages \u2014 data points contain the latest only`);
+    }
     const latest = newMessages[0];
     this._lastInboundId = latest.id;
     await this.setState("sms.inbound.id", { val: latest.id, ack: true });
@@ -844,7 +687,7 @@ class Sevenio extends utils.Adapter {
     return this.apiPost("/sms", body);
   }
   async sendVoice(opts) {
-    var _a;
+    var _a, _b, _c, _d;
     if (!opts.to || !opts.text) {
       throw new Error('"to" and "text" are required');
     }
@@ -858,7 +701,29 @@ class Sevenio extends utils.Adapter {
       body.from = opts.from;
     }
     this.log.debug(`Initiating voice call to ${opts.to}`);
-    return this.apiPost("/voice", body);
+    const raw = await this.apiPostText("/voice", body);
+    const lines = raw.trim().split("\n").map((l) => l.trim());
+    return {
+      success: parseInt((_b = lines[0]) != null ? _b : "500", 10),
+      id: (_c = lines[1]) != null ? _c : "",
+      cost: parseFloat((_d = lines[2]) != null ? _d : "0") || 0
+    };
+  }
+  async apiPostText(path, body) {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: {
+        "X-Api-Key": this.cfg.apiKey,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams(body).toString(),
+      signal: AbortSignal.timeout(3e4)
+    });
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => "");
+      throw new Error(`HTTP ${res.status} ${res.statusText}${errBody ? ` \u2014 ${errBody}` : ""}`);
+    }
+    return res.text();
   }
   parseBody(text) {
     try {
