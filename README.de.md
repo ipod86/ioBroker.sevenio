@@ -165,6 +165,8 @@ Im seven.io-Dashboard eine virtuelle Inbound-Rufnummer mieten. Antworten kommen 
 
 > Das Polling-Intervall in den Adaptereinstellungen konfigurieren. Auf `0` setzen zum Deaktivieren (z. B. wenn Webhooks genutzt werden).
 
+> **Mehrere Nachrichten pro Zyklus:** Treffen zwischen zwei Polls mehrere SMS ein, verarbeitet der Adapter alle davon — von ältester zu neuester. Jede Nachricht löst eine eigene Zustandsänderung an `sms.inbound.text` aus, sodass jede Blockly-Regel oder jedes JavaScript-Skript, das diesen Datenpunkt beobachtet, einmal pro Nachricht ausgeführt wird. Nach dem Zyklus enthalten die Datenpunkte stets die neueste Nachricht.
+
 ---
 
 ## Blockly
@@ -275,6 +277,9 @@ Der Datenpunkt `sms.lastStatus` enthält eine lesbare Übersetzung des seven.io-
     Platzhalter für die nächste Version (am Zeilenanfang):
     ### **WORK IN PROGRESS**
 -->
+
+### 0.1.1 (2026-07-22)
+* (ipod86) Fix: Mehrere eingehende SMS pro Poll-Zyklus lösen nun jeweils eine eigene Automatisierung aus (Verarbeitung von ältester zu neuester)
 
 ### 0.1.0 (2026-07-22)
 * (ipod86) SMS versenden via Datenpunkt, Blockly und sendTo()

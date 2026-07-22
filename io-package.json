@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "sevenio",
-		"version": "0.1.0",
+		"version": "0.1.1",
 		"news": {
+			"0.1.1": {
+				"en": "Fix: multiple inbound SMS per poll cycle now each trigger automations",
+				"de": "Fix: Mehrere eingehende SMS pro Poll-Zyklus lösen nun jeweils eine eigene Automatisierung aus",
+				"ru": "Исправление: несколько входящих SMS за цикл опроса теперь каждое запускает автоматизацию",
+				"pt": "Correção: vários SMS recebidos por ciclo de polling agora acionam automações individualmente",
+				"nl": "Fix: meerdere inkomende SMS per poll-cyclus activeren nu elk een automatisering",
+				"fr": "Correction: plusieurs SMS entrants par cycle de polling déclenchent désormais chacun une automatisation",
+				"it": "Fix: più SMS in entrata per ciclo di polling ora ognuno attiva un'automazione",
+				"es": "Corrección: varios SMS entrantes por ciclo de sondeo ahora activan automatizaciones individualmente",
+				"pl": "Poprawka: wiele przychodzących SMS-ów na cykl pollingu teraz każdy wyzwala automatyzację",
+				"uk": "Виправлення: кілька вхідних SMS за цикл опитування тепер кожен запускає автоматизацію",
+				"zh-cn": "修复：每个轮询周期的多条入站短信现在各自触发自动化"
+			},
 			"0.1.0": {
 				"en": "SMS, voice calls, contacts, inbound polling, delivery status, pricing, statistics",
 				"de": "SMS, Sprachanrufe, Kontakte, Inbound-Polling, Zustellstatus, Preise, Statistiken",

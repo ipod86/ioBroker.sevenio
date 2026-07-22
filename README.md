@@ -165,6 +165,8 @@ Rent a virtual inbound number directly in your seven.io dashboard. Replies arriv
 
 > Configure the polling interval in the adapter settings. Set to `0` to disable inbound polling (e.g. if you use webhooks instead).
 
+> **Multiple messages per cycle:** If several SMS arrive between two polls, the adapter processes them all — oldest first. Each message triggers a separate state change on `sms.inbound.text`, so every Blockly rule or JavaScript automation that watches this state fires once per message. The data points always reflect the most recent message after the cycle.
+
 ---
 
 ## Blockly
@@ -275,6 +277,9 @@ The `sms.lastStatus` state contains a human-readable translation of the seven.io
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### 0.1.1 (2026-07-22)
+* (ipod86) Fix: multiple inbound SMS per poll cycle now each trigger automations (processed oldest-first)
 
 ### 0.1.0 (2026-07-22)
 * (ipod86) SMS sending via state, Blockly, and sendTo()
