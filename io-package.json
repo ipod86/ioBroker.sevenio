@@ -28,8 +28,7 @@
 				"pl": "SMS, połączenia głosowe, kontakty, polling przychodzący, status dostarczenia, ceny, statystyki",
 				"uk": "SMS, голосові дзвінки, контакти, опитування вхідних, статус доставки, ціни, статистика",
 				"zh-cn": "短信、语音通话、联系人、接收轮询、投递状态、价格、统计"
-			},
-
+			}
 		},
 		"titleLang": {
 			"en": "seven.io SMS & Communication",
