@@ -29,19 +29,7 @@
 				"uk": "SMS, голосові дзвінки, контакти, опитування вхідних, статус доставки, ціни, статистика",
 				"zh-cn": "短信、语音通话、联系人、接收轮询、投递状态、价格、统计"
 			},
-			"0.0.1": {
-				"en": "initial release",
-				"de": "Erstveröffentlichung",
-				"ru": "Начальная версия",
-				"pt": "lançamento inicial",
-				"nl": "Eerste uitgave",
-				"fr": "Première version",
-				"it": "Versione iniziale",
-				"es": "Versión inicial",
-				"pl": "Pierwsze wydanie",
-				"uk": "Початкова версія",
-				"zh-cn": "首次出版"
-			}
+
 		},
 		"titleLang": {
 			"en": "seven.io SMS & Communication",
