@@ -77,4 +77,3 @@ jobs:
           node-version: '24.x'
           build: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          npm-token: ${{ secrets.NPM_TOKEN }}
