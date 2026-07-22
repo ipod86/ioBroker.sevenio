@@ -5,6 +5,7 @@
 		"_header_api": {
 			"type": "header",
 			"text": "headerApi",
+			"size": 12,
 			"newLine": true
 		},
 		"apiKey": {
@@ -32,6 +33,7 @@
 		"_header_inbound": {
 			"type": "header",
 			"text": "headerInbound",
+			"size": 12,
 			"newLine": true
 		},
 		"inboundInterval": {
@@ -61,6 +63,7 @@
 		"_header_opt2": {
 			"type": "header",
 			"text": "headerOwnNumber",
+			"size": 12,
 			"newLine": true,
 			"hidden": "data.inboundInterval < 1"
 		},
@@ -78,6 +81,7 @@
 		"_header_pricing": {
 			"type": "header",
 			"text": "headerPricing",
+			"size": 12,
 			"newLine": true
 		},
 		"pricingCountry": {
