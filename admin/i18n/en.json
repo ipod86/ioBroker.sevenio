@@ -9,12 +9,12 @@
 	"headerInbound": "Inbound SMS & Replies",
 	"defaultGetReplies": "Replies via shared pool (free, no own number)",
 	"inboundInterval": "Inbound polling interval (minutes, 0 = off)",
-	"inboundIntervalHelp": "Set to 0 to disable. When > 0, two inbound options appear below.",
+	"inboundIntervalHelp": "How often to poll for incoming SMS. 0 = off. Fetches replies to shared-pool SMS (opt-in per message via Blockly or getReplies in sendTo) and SMS to your own rented number.",
 	"headerPricing": "Pricing & Statistics",
 	"pricingCountry": "Country code for pricing (e.g. DE, US)",
 	"pricingCountryHelp": "ISO country code to filter pricing data. Leave empty to load prices for all countries.",
 	"defaultGetRepliesInfo": "ℹ️ seven.io temporarily assigns a shared pool number as sender — recipients can reply within 48 h. Available for DE, AT, CH, US, PL. seven.io tries to reuse the same number within 2 weeks, but this is not guaranteed.",
 	"headerSharedPool": "Option 1 — Shared Pool (free, no own number)",
-	"headerOwnNumber": "Option 2 — Own inbound number (~€20/month)",
+	"headerOwnNumber": "Own inbound number (~€20/month)",
 	"ownNumberInfo": "Enter your rented number in 'Default Sender ID'. SMS sent from that number can always be replied to — no shared pool needed."
 }

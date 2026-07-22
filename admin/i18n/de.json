@@ -9,12 +9,12 @@
 	"headerInbound": "Eingehende SMS & Antworten",
 	"defaultGetReplies": "Antworten via Shared Pool (kostenlos, keine eigene Nummer)",
 	"inboundInterval": "Inbound-Abfrageintervall (Minuten, 0 = aus)",
-	"inboundIntervalHelp": "0 = deaktiviert. Bei Wert > 0 erscheinen unten zwei Inbound-Optionen.",
+	"inboundIntervalHelp": "Wie oft nach eingehenden SMS geprüft wird. 0 = aus. Holt Antworten auf Shared-Pool-SMS (pro Nachricht opt-in via Blockly oder getReplies in sendTo) sowie SMS an die eigene gemietete Nummer.",
 	"headerPricing": "Preise & Statistiken",
 	"pricingCountry": "Ländercode für Preisabfrage (z. B. DE, US)",
 	"pricingCountryHelp": "ISO-Ländercode zum Filtern der Preisdaten. Leer lassen für alle Länder.",
 	"defaultGetRepliesInfo": "ℹ️ seven.io weist temporär eine Pool-Nummer als Absender zu — Empfänger können innerhalb von 48 Std. antworten. Verfügbar für DE, AT, CH, US, PL. Innerhalb von 2 Wochen versucht seven.io dieselbe Nummer zu verwenden — ohne Garantie.",
 	"headerSharedPool": "Option 1 — Shared Pool (kostenlos, keine eigene Nummer)",
-	"headerOwnNumber": "Option 2 — Eigene Inbound-Nummer (~20 €/Monat)",
+	"headerOwnNumber": "Eigene Inbound-Nummer (~20 €/Monat)",
 	"ownNumberInfo": "Gemietete Rufnummer in 'Standard-Absender-ID' eintragen. SMS von dieser Nummer können jederzeit beantwortet werden — kein Shared Pool nötig."
 }

@@ -58,34 +58,6 @@
 			"lg": 4,
 			"xl": 4
 		},
-		"_header_opt1": {
-			"type": "header",
-			"text": "headerSharedPool",
-			"newLine": true,
-			"hidden": "data.inboundInterval < 1"
-		},
-		"defaultGetReplies": {
-			"type": "checkbox",
-			"label": "defaultGetReplies",
-			"newLine": true,
-			"hidden": "data.inboundInterval < 1",
-			"xs": 12,
-			"sm": 12,
-			"md": 6,
-			"lg": 4,
-			"xl": 4
-		},
-		"_getRepliesInfo": {
-			"type": "staticText",
-			"text": "defaultGetRepliesInfo",
-			"newLine": true,
-			"hidden": "!data.defaultGetReplies || data.inboundInterval < 1",
-			"xs": 12,
-			"sm": 12,
-			"md": 10,
-			"lg": 8,
-			"xl": 7
-		},
 		"_header_opt2": {
 			"type": "header",
 			"text": "headerOwnNumber",

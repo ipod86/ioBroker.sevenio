@@ -9,12 +9,12 @@
 	"headerInbound": "SMS entrantes & respuestas",
 	"defaultGetReplies": "Respuestas via pool compartido (gratuito, sin número propio)",
 	"inboundInterval": "Intervalo de polling entrante (minutos, 0 = desact.)",
-	"inboundIntervalHelp": "0 = desactivado. Si > 0, aparecen dos opciones de entrada abajo.",
+	"inboundIntervalHelp": "Frecuencia de revisión de SMS entrantes. 0 = desact. Obtiene respuestas a SMS de pool compartido (opt-in por mensaje via Blockly o getReplies en sendTo) y SMS a su propio número.",
 	"headerPricing": "Precios & estadísticas",
 	"pricingCountry": "Código de país para precios (ej. DE, US)",
 	"pricingCountryHelp": "Código ISO del país para filtrar datos de precios. Dejar vacío para todos los países.",
 	"defaultGetRepliesInfo": "ℹ️ seven.io asigna temporalmente un número de pool compartido como remitente — los destinatarios pueden responder en 48 h. Disponible para DE, AT, CH, US, PL. En 2 semanas seven.io intenta reutilizar el mismo número — sin garantía.",
 	"headerSharedPool": "Opción 1 — Pool compartido (gratuito, sin número propio)",
-	"headerOwnNumber": "Opción 2 — Número entrante propio (~20 €/mes)",
+	"headerOwnNumber": "Número entrante propio (~20 €/mes)",
 	"ownNumberInfo": "Introduce el número alquilado en 'ID de remitente predeterminado'. Los SMS enviados desde ese número siempre pueden recibir respuestas — sin pool compartido."
 }

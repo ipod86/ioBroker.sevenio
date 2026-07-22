@@ -9,12 +9,12 @@
 	"headerInbound": "Przychodzące SMS i odpowiedzi",
 	"defaultGetReplies": "Odpowiedzi przez wspólną pulę (bezpłatnie, bez własnego numeru)",
 	"inboundInterval": "Interwał polling przychodzących (minuty, 0 = wył.)",
-	"inboundIntervalHelp": "0 = wyłączone. Gdy > 0, poniżej pojawiają się dwie opcje inbound.",
+	"inboundIntervalHelp": "Jak często sprawdzać przychodzące SMS. 0 = wył. Pobiera odpowiedzi na SMS ze wspólną pulą (opt-in per wiadomość przez Blockly lub getReplies w sendTo) i SMS na własny numer.",
 	"headerPricing": "Ceny & statystyki",
 	"pricingCountry": "Kod kraju dla cen (np. DE, US)",
 	"pricingCountryHelp": "Kod ISO kraju do filtrowania danych cenowych. Pozostaw puste dla wszystkich krajów.",
 	"defaultGetRepliesInfo": "ℹ️ seven.io tymczasowo przypisuje numer wspólnej puli jako nadawcę — odbiorcy mogą odpowiadać w ciągu 48 godz. Dostępne dla DE, AT, CH, US, PL. W ciągu 2 tygodni seven.io próbuje ponownie użyć tego samego numeru — bez gwarancji.",
 	"headerSharedPool": "Opcja 1 — Pula wspólna (bezpłatnie, bez własnego numeru)",
-	"headerOwnNumber": "Opcja 2 — Własny numer przychodzący (~20 €/mies.)",
+	"headerOwnNumber": "Własny numer przychodzący (~20 €/mies.)",
 	"ownNumberInfo": "Wprowadź wynajęty numer w polu 'Domyślny ID nadawcy'. SMS wysłane z tego numeru zawsze mogą być odpowiadane — bez wspólnej puli."
 }

@@ -80,7 +80,6 @@
 	"native": {
 		"apiKey": "",
 		"defaultSender": "",
-		"defaultGetReplies": false,
 		"balanceInterval": 30,
 		"inboundInterval": 0,
 		"pricingCountry": ""

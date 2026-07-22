@@ -3,7 +3,6 @@ import * as utils from '@iobroker/adapter-core';
 interface SevenioConfig extends ioBroker.AdapterConfig {
 	apiKey: string;
 	defaultSender: string;
-	defaultGetReplies: boolean;
 	balanceInterval: number;
 	inboundInterval: number;
 	pricingCountry: string;
@@ -262,7 +261,7 @@ class Sevenio extends utils.Adapter {
 				const smsOpts: SmsOpts = {
 					...msg,
 					to: this.resolveRecipient(msg.to),
-					getReplies: msg.getReplies ?? this.cfg.defaultGetReplies ?? false,
+					getReplies: msg.getReplies ?? false,
 				};
 				void this.sendSms(smsOpts)
 					.then(async result => {
@@ -855,7 +854,7 @@ class Sevenio extends utils.Adapter {
 			text: String(text?.val ?? ''),
 			from: String(from?.val ?? ''),
 			flash: Boolean(flash?.val ?? false),
-			getReplies: Boolean(getReplies?.val ?? this.cfg.defaultGetReplies ?? false),
+			getReplies: Boolean(getReplies?.val ?? false),
 		};
 		if (!opts.to || !opts.text) {
 			this.log.warn('SMS send triggered but "to" or "text" is empty');

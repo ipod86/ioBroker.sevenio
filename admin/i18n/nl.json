@@ -9,12 +9,12 @@
 	"headerInbound": "Inkomende SMS & antwoorden",
 	"defaultGetReplies": "Antwoorden via gedeelde pool (gratis, zonder eigen nummer)",
 	"inboundInterval": "Inbound polling interval (minuten, 0 = uit)",
-	"inboundIntervalHelp": "0 = uitgeschakeld. Als > 0 verschijnen hieronder twee inbound opties.",
+	"inboundIntervalHelp": "Hoe vaak inkomende SMS worden gecontroleerd. 0 = uit. Haalt antwoorden op voor shared-pool SMS (opt-in per bericht via Blockly of getReplies in sendTo) en SMS op uw eigen nummer.",
 	"headerPricing": "Prijzen & statistieken",
 	"pricingCountry": "Landcode voor prijzen (bijv. DE, US)",
 	"pricingCountryHelp": "ISO-landcode om prijsgegevens te filteren. Leeg laten voor alle landen.",
 	"defaultGetRepliesInfo": "ℹ️ seven.io wijst tijdelijk een gedeeld poolnummer toe als afzender — ontvangers kunnen binnen 48 u antwoorden. Beschikbaar voor DE, AT, CH, US, PL. Binnen 2 weken probeert seven.io hetzelfde nummer te hergebruiken — zonder garantie.",
 	"headerSharedPool": "Optie 1 — Gedeelde pool (gratis, zonder eigen nummer)",
-	"headerOwnNumber": "Optie 2 — Eigen inbound nummer (~€20/maand)",
+	"headerOwnNumber": "Eigen inbound nummer (~€20/maand)",
 	"ownNumberInfo": "Voer het gehuurde nummer in bij 'Standaard afzender-ID'. SMS verzonden vanaf dat nummer kunnen altijd worden beantwoord — geen gedeelde pool nodig."
 }
