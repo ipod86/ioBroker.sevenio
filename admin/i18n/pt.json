@@ -2,10 +2,12 @@
 	"sevenio adapter settings": "Configurações do adaptador seven.io",
 	"apiKey": "Chave API",
 	"defaultSender": "ID de remetente padrão (opcional)",
-	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos ou 16 numéricos. Vazio = padrão seven.io. Um ID de remetente alfanumérico não pode receber respostas SMS.",
+	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos ou 16 numéricos. Vazio = padrão seven.io. Importante: remetentes alfanuméricos (ex. 'MinhaEmpresa') não podem receber respostas SMS — apenas números de telefone permitem SMS recebidos.",
+	"defaultGetReplies": "Ativar respostas por padrão (pool compartilhado)",
+	"defaultGetRepliesHelp": "Se ativado, os SMS são enviados via um número de pool temporário compartilhado para que os destinatários possam responder. As respostas chegam em 48 horas. Em 2 semanas o seven.io tenta atribuir o mesmo número — sem garantia. Gratuito, nenhum número próprio necessário. Disponível para DE, AT, CH, US, PL.",
 	"balanceInterval": "Intervalo de consulta de saldo (minutos)",
 	"inboundInterval": "Intervalo de SMS recebidos (minutos)",
-	"inboundIntervalHelp": "0 = desativado. Requer um número virtual seven.io (~20 €/mês). Remetentes alfanuméricos não podem receber SMS — apenas remetentes numéricos ou número virtual alugado permitem isso.",
+	"inboundIntervalHelp": "0 = desativado. Duas opções para SMS recebidos: ① Pool compartilhado (gratuito) — ativar 'Ativar respostas' acima, sem número próprio necessário, respostas em 48 h, disponível para DE/AT/CH/US/PL. ② Número de entrada próprio (~20 €/mês, permanente) — alugar no painel seven.io.",
 	"pricingCountry": "Código de país para preços (ex. DE, US)",
 	"pricingCountryHelp": "Código ISO do país para filtrar dados de preços. Deixe vazio para todos os países."
 }

@@ -47,9 +47,10 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 | Einstellung | Beschreibung | Standard |
 |---|---|---|
 | **API-Key** | Dein seven.io API-Key | *(erforderlich)* |
-| **Standard-Absender-ID** | Absendername oder -nummer für Empfänger. Max. 11 alphanumerische **oder** 16 numerische Zeichen. **Alphanumerische Absender-IDs können keine SMS-Antworten empfangen** — nur numerische Absender oder eine gemietete Rufnummer erlauben Inbound-SMS. Leer lassen = seven.io-Kontovorgabe. | *(leer)* |
+| **Standard-Absender-ID** | Absendername oder -nummer für Empfänger. Max. 11 alphanumerische **oder** 16 numerische Zeichen. **Alphanumerische Absender-IDs können keine SMS-Antworten empfangen** — nur numerische Rufnummern oder eine Poolnummer erlauben Inbound-SMS. Leer lassen = seven.io-Kontovorgabe. | *(leer)* |
+| **Antworten standardmäßig aktivieren** | Wenn aktiv, werden SMS über eine geteilte Poolnummer versandt, damit Empfänger antworten können. Details unter [Eingehende SMS](#eingehende-sms). | `aus` |
 | **Kontostand-Intervall** | Wie oft (in Minuten) der Adapter den Kontostand abfragt | `30` |
-| **Inbound-Intervall** | Wie oft (in Minuten) der Adapter neue eingehende SMS prüft. `0` = Inbound-Polling deaktiviert. | `0` |
+| **Inbound-Intervall** | Wie oft (in Minuten) der Adapter neue eingehende SMS prüft. `0` = deaktiviert. | `0` |
 | **Ländercode für Preisabfrage** | ISO-Ländercode (z. B. `DE`, `US`) zum Laden der SMS-Preise nur für dieses Land. Leer lassen = alle Länder. | *(leer)* |
 
 ---
@@ -86,12 +87,13 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 | `sms.from` | string | rw | Absender-ID überschreiben — leer = Standardwert aus den Einstellungen |
 | `sms.text` | string | rw | Nachrichtentext (max. 1520 Zeichen / ~10 SMS-Teile) |
 | `sms.flash` | boolean | rw | Als Flash-SMS senden (erscheint direkt auf dem Display) |
+| `sms.getReplies` | boolean | rw | Antworten via Shared Pool aktivieren — überschreibt die Standardeinstellung |
 | `sms.send` | boolean | rw | Auf `true` setzen → Versand auslösen — wird automatisch auf `false` zurückgesetzt |
 | `sms.lastResult` | string (JSON) | r | Vollständige API-Antwort des letzten Versands, inkl. `statusText` |
 | `sms.lastStatus` | string | r | Lesbarer Status des letzten Versands (z. B. `Success`, `Insufficient credits`) |
 | `sms.lastDelivery` | string (JSON) | r | Zustellbericht ~60 s nach dem Versand — enthält `id`, `to`, `status` (z. B. `DELIVERED`) |
 
-### `sms.inbound` *(erfordert virtuelle Rufnummer)*
+### `sms.inbound`
 | Datenpunkt | Typ | Beschreibung |
 |---|---|---|
 | `sms.inbound.id` | string | Nachrichten-ID der zuletzt empfangenen SMS |
@@ -130,6 +132,40 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 
 ---
 
+## Eingehende SMS
+
+Um SMS-Antworten empfangen zu können, ist eine **numerische Absender-Rufnummer** nötig — alphanumerische Namen (z. B. `MeinFirma`) können technisch keine Antworten empfangen.
+
+Es gibt zwei Optionen:
+
+### Option 1 — Shared Pool (kostenlos, zum Testen und leichtem Betrieb)
+
+**Antworten aktivieren** in den Einstellungen einschalten, oder `getReplies: true` beim Versand übergeben. seven.io weist dann automatisch eine temporäre geteilte Poolnummer als Absender zu.
+
+| | |
+|---|---|
+| **Kosten** | Kostenlos — nur reguläre SMS-Versandkosten |
+| **Antwort-Zeitfenster** | 48 Stunden nach dem Versand |
+| **Nummerbeständigkeit** | Innerhalb von 2 Wochen wird versucht, dieselbe Nummer zuzuteilen — ohne Garantie |
+| **Verfügbare Länder** | DE 🇩🇪 AT 🇦🇹 CH 🇨🇭 US 🇺🇸 PL 🇵🇱 |
+| **Geeignet für** | Tests, geringes Volumen, unkritische Benachrichtigungen |
+
+### Option 2 — Eigene Inbound-Nummer (~20 €/Monat)
+
+Im seven.io-Dashboard eine virtuelle Inbound-Rufnummer mieten. Antworten kommen dauerhaft und zuverlässig an.
+
+| | |
+|---|---|
+| **Kosten** | ~20 €/Monat |
+| **Antwort-Zeitfenster** | Unbegrenzt |
+| **Nummerbeständigkeit** | Fest, immer dieselbe Nummer |
+| **Verfügbare Länder** | Viele — im seven.io-Dashboard prüfen |
+| **Geeignet für** | Laufender Kundenkontakt, Produktiveinsatz |
+
+> Das Polling-Intervall in den Adaptereinstellungen konfigurieren. Auf `0` setzen zum Deaktivieren (z. B. wenn Webhooks genutzt werden).
+
+---
+
 ## Blockly
 
 Nach der Installation erscheint in der ioBroker-Blockly-Oberfläche ein fertiger Baustein in der Kategorie **sendTo**.
@@ -161,6 +197,7 @@ sendTo('sevenio.0', 'send', {
     to: '+491234567890',   // oder Kontaktname: 'Max Mustermann'
     text: 'Tür geöffnet!',
     flash: false,          // optional
+    getReplies: true,      // optional — Shared Pool aktivieren damit Empfänger antworten kann
 }, result => {
     console.log(result.statusText); // z. B. 'Success'
 });

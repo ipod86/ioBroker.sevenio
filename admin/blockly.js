@@ -52,6 +52,19 @@ Blockly.Words['sevenio_flash'] = {
     nl: 'flash SMS', fr: 'Flash SMS', it: 'Flash SMS', es: 'Flash SMS',
     pl: 'Flash SMS', uk: 'Flash SMS', 'zh-cn': '闪信',
 };
+Blockly.Words['sevenio_get_replies'] = {
+    en: 'enable replies (shared pool)',
+    de: 'Antworten aktivieren (Shared Pool)',
+    ru: 'разрешить ответы (общий пул)',
+    pt: 'ativar respostas (pool compartilhado)',
+    nl: 'antwoorden inschakelen (gedeelde pool)',
+    fr: 'activer les réponses (pool partagé)',
+    it: 'abilita risposte (pool condiviso)',
+    es: 'habilitar respuestas (pool compartido)',
+    pl: 'włącz odpowiedzi (pula wspólna)',
+    uk: 'увімкнути відповіді (спільний пул)',
+    'zh-cn': '启用回复（共享号码池）',
+};
 Blockly.Words['sevenio_ringtime'] = {
     en: 'ring time (s)',        de: 'Klingelzeit (s)',      ru: 'время звонка (с)',
     pt: 'tempo de toque (s)',   nl: 'beltijd (s)',          fr: 'durée sonnerie (s)',
@@ -98,6 +111,7 @@ Blockly.Sendto.blocks['sevenio_send'] =
     '  <field name="SEND_SMS">TRUE</field>' +
     '  <field name="SEND_VOICE">FALSE</field>' +
     '  <field name="FLASH">FALSE</field>' +
+    '  <field name="GET_REPLIES">FALSE</field>' +
     '  <field name="RINGTIME">30</field>' +
     '  <value name="FROM">' +
     '    <shadow type="text">' +
@@ -159,7 +173,9 @@ Blockly.Blocks['sevenio_send'] = {
 
         this.appendDummyInput('SMS_OPTS')
             .appendField(Blockly.Translate('sevenio_flash'))
-            .appendField(new Blockly.FieldCheckbox('FALSE'), 'FLASH');
+            .appendField(new Blockly.FieldCheckbox('FALSE'), 'FLASH')
+            .appendField('  ' + Blockly.Translate('sevenio_get_replies'))
+            .appendField(new Blockly.FieldCheckbox('FALSE'), 'GET_REPLIES');
 
         this.appendDummyInput('VOICE_OPTS')
             .appendField(Blockly.Translate('sevenio_ringtime'))
@@ -179,7 +195,8 @@ Blockly.JavaScript['sevenio_send'] = function (block) {
     const instance  = block.getFieldValue('INSTANCE');
     const sendSms   = block.getFieldValue('SEND_SMS')   === 'TRUE';
     const sendVoice = block.getFieldValue('SEND_VOICE') === 'TRUE';
-    const flash     = block.getFieldValue('FLASH')      === 'TRUE';
+    const flash      = block.getFieldValue('FLASH')       === 'TRUE';
+    const getReplies = block.getFieldValue('GET_REPLIES') === 'TRUE';
     const ringtime  = parseInt(block.getFieldValue('RINGTIME'), 10);
     const from = Blockly.JavaScript.valueToCode(block, 'FROM', Blockly.JavaScript.ORDER_ATOMIC) || "''";
     const to   = Blockly.JavaScript.valueToCode(block, 'TO',   Blockly.JavaScript.ORDER_ATOMIC) || "''";
@@ -188,7 +205,7 @@ Blockly.JavaScript['sevenio_send'] = function (block) {
     const target = `'sevenio${instance}'`;
     const lines = [];
     if (sendSms) {
-        lines.push(`sendTo(${target}, 'send', { to: ${to}, text: ${text}, from: ${from}, flash: ${flash} });`);
+        lines.push(`sendTo(${target}, 'send', { to: ${to}, text: ${text}, from: ${from}, flash: ${flash}, getReplies: ${getReplies} });`);
     }
     if (sendVoice) {
         lines.push(`sendTo(${target}, 'voice', { to: ${to}, text: ${text}, from: ${from}, ringtime: ${ringtime} });`);

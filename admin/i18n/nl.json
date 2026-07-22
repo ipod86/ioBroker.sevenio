@@ -2,10 +2,12 @@
 	"sevenio adapter settings": "seven.io adapter instellingen",
 	"apiKey": "API-sleutel",
 	"defaultSender": "Standaard afzender-ID (optioneel)",
-	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Een alfanumerieke afzender-ID kan geen SMS-antwoorden ontvangen.",
+	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Belangrijk: alfanumerieke afzenders (bijv. 'MijnBedrijf') kunnen technisch geen SMS-antwoorden ontvangen — alleen numerieke telefoonnummers staan inkomende SMS toe.",
+	"defaultGetReplies": "Antwoorden standaard inschakelen (gedeelde pool)",
+	"defaultGetRepliesHelp": "Indien ingeschakeld worden SMS verstuurd via een tijdelijk gedeeld poolnummer zodat ontvangers kunnen antwoorden. Antwoorden komen binnen 48 uur aan. Binnen 2 weken probeert seven.io hetzelfde nummer toe te wijzen — zonder garantie. Gratis, geen eigen nummer vereist. Beschikbaar voor DE, AT, CH, US, PL.",
 	"balanceInterval": "Saldo-polling interval (minuten)",
 	"inboundInterval": "Binnenkomende SMS interval (minuten)",
-	"inboundIntervalHelp": "0 = uitgeschakeld. Vereist een virtueel seven.io nummer (~20 €/maand). Alfanumerieke afzenders kunnen geen SMS ontvangen — alleen numerieke afzenders of een gehuurd virtueel nummer staan dit toe.",
+	"inboundIntervalHelp": "0 = uitgeschakeld. Twee opties voor inkomende SMS: ① Gedeelde pool (gratis) — 'Antwoorden inschakelen' hierboven activeren, geen eigen nummer nodig, antwoorden binnen 48 u, beschikbaar voor DE/AT/CH/US/PL. ② Eigen inkomend nummer (~20 €/maand, permanent) — huren in het seven.io dashboard.",
 	"pricingCountry": "Landcode voor prijzen (bijv. DE, US)",
 	"pricingCountryHelp": "ISO-landcode om prijsgegevens te filteren. Leeg laten voor alle landen."
 }

@@ -3,6 +3,7 @@ import * as utils from '@iobroker/adapter-core';
 interface SevenioConfig extends ioBroker.AdapterConfig {
 	apiKey: string;
 	defaultSender: string;
+	defaultGetReplies: boolean;
 	balanceInterval: number;
 	inboundInterval: number;
 	pricingCountry: string;
@@ -129,6 +130,7 @@ interface SmsOpts {
 	text: string;
 	from?: string;
 	flash?: boolean;
+	getReplies?: boolean;
 	delay?: string;
 }
 
@@ -242,7 +244,11 @@ class Sevenio extends utils.Adapter {
 		switch (obj.command) {
 			case 'send': {
 				const msg = obj.message as SmsOpts;
-				const smsOpts: SmsOpts = { ...msg, to: this.resolveRecipient(msg.to) };
+				const smsOpts: SmsOpts = {
+					...msg,
+					to: this.resolveRecipient(msg.to),
+					getReplies: msg.getReplies ?? this.cfg.defaultGetReplies ?? false,
+				};
 				void this.sendSms(smsOpts)
 					.then(async result => {
 						const enriched = enrichSmsResult(result);
@@ -250,6 +256,10 @@ class Sevenio extends utils.Adapter {
 						await this.setState('sms.text', { val: smsOpts.text, ack: true });
 						await this.setState('sms.from', { val: smsOpts.from ?? '', ack: true });
 						await this.setState('sms.flash', { val: smsOpts.flash ?? false, ack: true });
+						await this.setState('sms.getReplies', {
+							val: smsOpts.getReplies ?? false,
+							ack: true,
+						});
 						const status = smsStatusText(enriched);
 						if (smsIsSuccess(enriched)) {
 							this.log.debug(`SMS to ${msg.to}: ${status}`);
@@ -381,6 +391,17 @@ class Sevenio extends utils.Adapter {
 			],
 			['sms.text', { name: 'Message text', type: 'string', role: 'text', read: true, write: true, def: '' }],
 			['sms.flash', { name: 'Flash SMS', type: 'boolean', role: 'switch', read: true, write: true, def: false }],
+			[
+				'sms.getReplies',
+				{
+					name: 'Enable replies (shared pool or own number)',
+					type: 'boolean',
+					role: 'switch',
+					read: true,
+					write: true,
+					def: false,
+				},
+			],
 			['sms.send', { name: 'Send SMS', type: 'boolean', role: 'button', read: false, write: true, def: false }],
 			[
 				'sms.lastResult',
@@ -803,17 +824,19 @@ class Sevenio extends utils.Adapter {
 
 	private async triggerSms(): Promise<void> {
 		await this.setState('sms.send', { val: false, ack: true });
-		const [to, text, from, flash] = await Promise.all([
+		const [to, text, from, flash, getReplies] = await Promise.all([
 			this.getStateAsync('sms.to'),
 			this.getStateAsync('sms.text'),
 			this.getStateAsync('sms.from'),
 			this.getStateAsync('sms.flash'),
+			this.getStateAsync('sms.getReplies'),
 		]);
 		const opts: SmsOpts = {
 			to: this.resolveRecipient(String(to?.val ?? '')),
 			text: String(text?.val ?? ''),
 			from: String(from?.val ?? ''),
 			flash: Boolean(flash?.val ?? false),
+			getReplies: Boolean(getReplies?.val ?? this.cfg.defaultGetReplies ?? false),
 		};
 		if (!opts.to || !opts.text) {
 			this.log.warn('SMS send triggered but "to" or "text" is empty');
@@ -885,10 +908,13 @@ class Sevenio extends utils.Adapter {
 		if (opts.flash) {
 			body.flash = '1';
 		}
+		if (opts.getReplies) {
+			body.get_replies = '1';
+		}
 		if (opts.delay) {
 			body.delay = opts.delay;
 		}
-		this.log.debug(`Sending SMS to ${opts.to}`);
+		this.log.debug(`Sending SMS to ${opts.to}${opts.getReplies ? ' (replies enabled)' : ''}`);
 		return this.apiPost('/sms', body);
 	}
 

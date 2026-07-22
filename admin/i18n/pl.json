@@ -2,10 +2,12 @@
 	"sevenio adapter settings": "Ustawienia adaptera seven.io",
 	"apiKey": "Klucz API",
 	"defaultSender": "Domyślny identyfikator nadawcy (opcjonalnie)",
-	"defaultSenderHelp": "Maks. 11 znaków alfanumerycznych lub 16 cyfr. Puste = domyślne seven.io. Alfanumeryczny nadawca nie może odbierać odpowiedzi SMS.",
+	"defaultSenderHelp": "Maks. 11 znaków alfanumerycznych lub 16 cyfr. Puste = domyślne seven.io. Ważne: alfanumeryczni nadawcy (np. 'MojaFirma') technicznie nie mogą odbierać odpowiedzi SMS — tylko numery telefonów umożliwiają odbieranie SMS.",
+	"defaultGetReplies": "Włącz odpowiedzi domyślnie (pula wspólna)",
+	"defaultGetRepliesHelp": "Gdy włączone, SMS są wysyłane przez tymczasowy wspólny numer puli, aby odbiorcy mogli odpowiadać. Odpowiedzi docierają w ciągu 48 godzin. W ciągu 2 tygodni seven.io próbuje przypisać ten sam numer — bez gwarancji. Bezpłatnie, własny numer nie jest wymagany. Dostępne dla DE, AT, CH, US, PL.",
 	"balanceInterval": "Interwał odpytywania salda (minuty)",
 	"inboundInterval": "Interwał przychodzących SMS (minuty)",
-	"inboundIntervalHelp": "0 = wyłączone. Wymaga wirtualnego numeru seven.io (~20 €/mies.). Nadawcy alfanumeryczni nie mogą odbierać SMS — tylko nadawcy numeryczni lub wynajęty numer wirtualny to umożliwiają.",
+	"inboundIntervalHelp": "0 = wyłączone. Dwie opcje dla przychodzących SMS: ① Pula wspólna (bezpłatnie) — włączyć 'Włącz odpowiedzi' powyżej, własny numer nie jest wymagany, odpowiedzi w ciągu 48 godz., dostępne dla DE/AT/CH/US/PL. ② Własny numer przychodzący (~20 €/mies., stały) — wynajem w panelu seven.io.",
 	"pricingCountry": "Kod kraju dla cen (np. DE, US)",
 	"pricingCountryHelp": "Kod ISO kraju do filtrowania danych cenowych. Pozostaw puste dla wszystkich krajów."
 }

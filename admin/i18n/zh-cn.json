@@ -2,10 +2,12 @@
 	"sevenio adapter settings": "seven.io 适配器设置",
 	"apiKey": "API密钥",
 	"defaultSender": "默认发件人ID（可选）",
-	"defaultSenderHelp": "最多11个字母数字或16个数字字符。空 = seven.io账户默认值。字母数字发件人ID无法接收短信回复。",
+	"defaultSenderHelp": "最多11个字母数字或16个数字字符。空 = seven.io账户默认值。重要：字母数字发件人（如'我的公司'）无法接收短信回复——只有数字电话号码才允许接收短信。",
+	"defaultGetReplies": "默认启用回复（共享号码池）",
+	"defaultGetRepliesHelp": "启用后，短信通过临时共享号码池发送，以便收件人可以回复。回复在48小时内到达。seven.io在2周内尝试分配相同号码——不保证。免费，无需自己的号码。适用于DE、AT、CH、US、PL。",
 	"balanceInterval": "余额查询间隔（分钟）",
 	"inboundInterval": "入站短信查询间隔（分钟）",
-	"inboundIntervalHelp": "0 = 禁用。需要seven.io虚拟号码（约20欧元/月）。字母数字发件人无法接收短信——只有数字发件人或租用的虚拟号码才允许入站短信。",
+	"inboundIntervalHelp": "0 = 禁用。接收入站短信的两种方式：① 共享号码池（免费）——启用上方的'启用回复'，无需自己的号码，回复在48小时内到达，适用于DE/AT/CH/US/PL。② 自己的入站号码（约20欧元/月，永久）——在seven.io控制台租用。",
 	"pricingCountry": "价格查询国家代码（如DE、US）",
 	"pricingCountryHelp": "ISO国家代码用于筛选价格数据。留空显示所有国家。"
 }

@@ -35,6 +35,17 @@
 			"lg": 4,
 			"xl": 4
 		},
+		"defaultGetReplies": {
+			"type": "checkbox",
+			"label": "defaultGetReplies",
+			"help": "defaultGetRepliesHelp",
+			"newLine": true,
+			"xs": 12,
+			"sm": 12,
+			"md": 6,
+			"lg": 4,
+			"xl": 4
+		},
 		"inboundInterval": {
 			"type": "number",
 			"label": "inboundInterval",

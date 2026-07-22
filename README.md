@@ -47,9 +47,10 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | Setting | Description | Default |
 |---|---|---|
 | **API Key** | Your seven.io API key | *(required)* |
-| **Default Sender ID** | Sender name or number shown to recipients. Max 11 alphanumeric **or** 16 numeric characters. **Alphanumeric sender IDs cannot receive SMS replies** — only numeric senders or a rented virtual number allow inbound SMS. Leave empty to use the seven.io account default. | *(empty)* |
+| **Default Sender ID** | Sender name or number shown to recipients. Max 11 alphanumeric **or** 16 numeric characters. **Alphanumeric sender IDs cannot receive SMS replies** — only numeric phone numbers or a pool number allow inbound SMS. Leave empty to use the seven.io account default. | *(empty)* |
+| **Enable replies by default** | When enabled, SMS are sent via a shared pool number so recipients can reply. See [Inbound SMS](#inbound-sms) for details. | `off` |
 | **Balance polling interval** | How often (in minutes) the adapter polls your account balance | `30` |
-| **Inbound SMS polling interval** | How often (in minutes) the adapter checks for new incoming SMS. Set to `0` to disable inbound polling entirely. | `0` |
+| **Inbound SMS polling interval** | How often (in minutes) the adapter checks for new incoming SMS. Set to `0` to disable. | `0` |
 | **Country code for pricing** | ISO country code (e.g. `DE`, `US`) to load SMS pricing for that country only. Leave empty to load all countries. | *(empty)* |
 
 ---
@@ -86,12 +87,13 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | `sms.from` | string | rw | Sender ID override — empty = use default from settings |
 | `sms.text` | string | rw | Message text (max 1520 characters / ~10 SMS parts) |
 | `sms.flash` | boolean | rw | Send as flash SMS (message shown directly on screen) |
+| `sms.getReplies` | boolean | rw | Enable recipient replies via shared pool number — overrides the default from settings |
 | `sms.send` | boolean | rw | Set to `true` to send — resets to `false` automatically |
 | `sms.lastResult` | string (JSON) | r | Full API response of the last send attempt, including `statusText` |
 | `sms.lastStatus` | string | r | Human-readable status of the last send (e.g. `Success`, `Insufficient credits`) |
 | `sms.lastDelivery` | string (JSON) | r | Delivery report fetched ~60 s after sending — contains `id`, `to`, `status` (e.g. `DELIVERED`) |
 
-### `sms.inbound` *(requires virtual number)*
+### `sms.inbound`
 | State | Type | Description |
 |---|---|---|
 | `sms.inbound.id` | string | Message ID of the last received SMS |
@@ -130,6 +132,40 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 
 ---
 
+## Inbound SMS
+
+To receive SMS replies you need a **numeric sender** — alphanumeric names (e.g. `MyCompany`) cannot receive replies (technically impossible).
+
+You have two options:
+
+### Option 1 — Shared pool (free, for testing and light use)
+
+Enable **"Enable replies"** in the adapter settings or pass `getReplies: true` when sending. seven.io automatically assigns a temporary shared pool number as the sender.
+
+| | |
+|---|---|
+| **Cost** | Free — only regular SMS sending costs apply |
+| **Reply window** | 48 hours after sending |
+| **Number stability** | Same number is tried within 2 weeks — not guaranteed |
+| **Available countries** | DE 🇩🇪 AT 🇦🇹 CH 🇨🇭 US 🇺🇸 PL 🇵🇱 |
+| **Suitable for** | Testing, low-volume, non-critical notifications |
+
+### Option 2 — Own inbound number (~€20/month)
+
+Rent a virtual inbound number directly in your seven.io dashboard. Replies arrive reliably and permanently.
+
+| | |
+|---|---|
+| **Cost** | ~€20/month |
+| **Reply window** | Unlimited |
+| **Number stability** | Fixed, always the same number |
+| **Available countries** | Many — check seven.io dashboard |
+| **Suitable for** | Ongoing customer communication, production use |
+
+> Configure the polling interval in the adapter settings. Set to `0` to disable inbound polling (e.g. if you use webhooks instead).
+
+---
+
 ## Blockly
 
 After installing the adapter a ready-to-use block appears in the **sendTo** category of the ioBroker Blockly editor.
@@ -161,6 +197,7 @@ sendTo('sevenio.0', 'send', {
     to: '+491234567890',   // or a contact name: 'Max Mustermann'
     text: 'Door opened!',
     flash: false,          // optional
+    getReplies: true,      // optional — enable shared pool so recipient can reply
 }, result => {
     console.log(result.statusText); // e.g. 'Success'
 });
