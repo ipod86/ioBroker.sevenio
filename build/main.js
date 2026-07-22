@@ -52,13 +52,31 @@ function smsStatusText(result) {
   }
   return (_a = SMS_STATUS[code]) != null ? _a : `Unknown status ${code}`;
 }
+const VOICE_STATUS = {
+  0: "Success",
+  100: "Invalid recipient number",
+  500: "Unknown error"
+};
+function voiceStatusText(result) {
+  var _a;
+  let code;
+  if (typeof result === "number" || typeof result === "string") {
+    code = String(result);
+  } else if (typeof result === "object" && result !== null) {
+    const raw = result.success;
+    code = typeof raw === "string" || typeof raw === "number" ? String(raw) : "";
+  } else {
+    return "Unknown status";
+  }
+  return (_a = VOICE_STATUS[code]) != null ? _a : `Unknown status ${code}`;
+}
 function voiceIsSuccess(result) {
+  if (typeof result === "number" || typeof result === "string") {
+    return String(result) === "0";
+  }
   if (typeof result === "object" && result !== null) {
-    const r = result;
-    if ("success" in r) {
-      const s = r.success;
-      return s === true || s === 1 || s === "1";
-    }
+    const s = result.success;
+    return s === true || s === 1 || s === "1" || String(s) === "0";
   }
   return true;
 }
@@ -191,12 +209,14 @@ class Sevenio extends utils.Adapter {
           if (msg.ringtime !== void 0) {
             await this.setState("voice.ringtime", { val: msg.ringtime, ack: true });
           }
+          const vStatus = voiceStatusText(result);
           if (voiceIsSuccess(result)) {
-            this.log.debug(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
+            this.log.debug(`Voice call to ${msg.to}: ${vStatus}`);
           } else {
-            this.log.info(`Voice call to ${msg.to}: ${JSON.stringify(result)}`);
+            this.log.info(`Voice call to ${msg.to}: ${vStatus}`);
           }
           await this.setState("voice.lastResult", { val: JSON.stringify(result), ack: true });
+          await this.setState("voice.lastStatus", { val: vStatus, ack: true });
           respond(result);
         }).catch((e) => respond({ error: e.message }));
         break;
@@ -468,6 +488,18 @@ class Sevenio extends utils.Adapter {
         name: "Last call result (JSON)",
         type: "string",
         role: "json",
+        read: true,
+        write: false,
+        def: ""
+      },
+      native: {}
+    });
+    await this.setObjectNotExistsAsync("voice.lastStatus", {
+      type: "state",
+      common: {
+        name: "Last call status (text)",
+        type: "string",
+        role: "text",
         read: true,
         write: false,
         def: ""
@@ -777,12 +809,14 @@ class Sevenio extends utils.Adapter {
     }
     try {
       const result = await this.sendVoice(opts);
+      const vStatus = voiceStatusText(result);
       if (voiceIsSuccess(result)) {
-        this.log.debug(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
+        this.log.debug(`Voice call to ${opts.to}: ${vStatus}`);
       } else {
-        this.log.info(`Voice call to ${opts.to}: ${JSON.stringify(result)}`);
+        this.log.info(`Voice call to ${opts.to}: ${vStatus}`);
       }
       await this.setState("voice.lastResult", { val: JSON.stringify(result), ack: true });
+      await this.setState("voice.lastStatus", { val: vStatus, ack: true });
     } catch (e) {
       this.log.error(`Voice call failed: ${e.message}`);
       await this.setState("voice.lastResult", {
