@@ -1,13 +1,17 @@
 {
 	"sevenio adapter settings": "Paramètres de l'adaptateur seven.io",
+	"headerApi": "Connexion API",
 	"apiKey": "Clé API",
-	"defaultSender": "Identifiant expéditeur par défaut (facultatif)",
-	"defaultSenderHelp": "Max. 11 caractères alphanumériques ou 16 numériques. Vide = valeur par défaut seven.io. Remarque : les expéditeurs alphanumériques (ex. 'MaSociété') ne peuvent pas recevoir directement de réponses SMS. Activez 'Activer les réponses' ci-dessous pour utiliser un numéro de pool partagé comme expéditeur — les réponses sont alors possibles quelle que soit cette configuration.",
-	"defaultGetReplies": "Activer les réponses par défaut (pool partagé)",
-	"defaultGetRepliesHelp": "Si activé, les SMS sont envoyés via un numéro de pool temporaire partagé pour que les destinataires puissent répondre. Les réponses arrivent dans les 48 heures. Dans les 2 semaines, seven.io essaie d'attribuer le même numéro — sans garantie. Gratuit, aucun numéro propre requis. Disponible pour DE, AT, CH, US, PL.",
 	"balanceInterval": "Intervalle de vérification du solde (minutes)",
-	"inboundInterval": "Intervalle de vérification des SMS entrants (minutes)",
-	"inboundIntervalHelp": "0 = désactivé. Deux options pour les SMS entrants : ① Pool partagé (gratuit) — activer 'Activer les réponses' ci-dessus, aucun numéro propre requis, réponses dans les 48 h, disponible pour DE/AT/CH/US/PL. ② Numéro entrant propre (~20 €/mois, permanent) — à louer dans le tableau de bord seven.io.",
+	"headerSender": "Expéditeur par défaut",
+	"defaultSender": "ID expéditeur par défaut (facultatif)",
+	"defaultSenderHelp": "Max. 11 caractères alphanumériques ou 16 numériques. Vide = valeur par défaut seven.io. Les ID alphanumériques (ex. 'MaSociété') ne peuvent pas recevoir de réponses directement — utilisez le pool partagé ci-dessous ou entrez votre propre numéro loué (numérique) ici pour un inbound permanent.",
+	"headerInbound": "SMS entrants & réponses",
+	"defaultGetReplies": "Activer les réponses par défaut (pool partagé, gratuit)",
+	"defaultGetRepliesHelp": "seven.io attribue temporairement un numéro de pool partagé comme expéditeur pour que les destinataires puissent répondre dans les 48 h. Fonctionne indépendamment de l'ID expéditeur ci-dessus. Aucun numéro propre requis. Disponible pour DE, AT, CH, US, PL. Dans les 2 semaines, seven.io tente de réutiliser le même numéro — sans garantie.",
+	"inboundInterval": "Intervalle de vérification entrant (minutes, 0 = désact.)",
+	"inboundIntervalHelp": "À quelle fréquence vérifier les SMS entrants. Fonctionne pour les deux options : réponses via pool partagé (si 'Activer les réponses' est activé) et numéro entrant propre loué (~20 €/mois). Mettre 0 pour désactiver.",
+	"headerPricing": "Tarifs & statistiques",
 	"pricingCountry": "Code pays pour les tarifs (ex. DE, US)",
 	"pricingCountryHelp": "Code ISO du pays pour filtrer les données tarifaires. Laisser vide pour tous les pays."
 }

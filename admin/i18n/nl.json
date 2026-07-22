@@ -1,13 +1,17 @@
 {
 	"sevenio adapter settings": "seven.io adapter instellingen",
+	"headerApi": "API-verbinding",
 	"apiKey": "API-sleutel",
-	"defaultSender": "Standaard afzender-ID (optioneel)",
-	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Opmerking: alfanumerieke afzenders (bijv. 'MijnBedrijf') kunnen geen directe SMS-antwoorden ontvangen. Schakel 'Antwoorden inschakelen' hieronder in om een gedeeld poolnummer als afzender te gebruiken — antwoorden zijn dan mogelijk ongeacht deze instelling.",
-	"defaultGetReplies": "Antwoorden standaard inschakelen (gedeelde pool)",
-	"defaultGetRepliesHelp": "Indien ingeschakeld worden SMS verstuurd via een tijdelijk gedeeld poolnummer zodat ontvangers kunnen antwoorden. Antwoorden komen binnen 48 uur aan. Binnen 2 weken probeert seven.io hetzelfde nummer toe te wijzen — zonder garantie. Gratis, geen eigen nummer vereist. Beschikbaar voor DE, AT, CH, US, PL.",
 	"balanceInterval": "Saldo-polling interval (minuten)",
-	"inboundInterval": "Binnenkomende SMS interval (minuten)",
-	"inboundIntervalHelp": "0 = uitgeschakeld. Twee opties voor inkomende SMS: ① Gedeelde pool (gratis) — 'Antwoorden inschakelen' hierboven activeren, geen eigen nummer nodig, antwoorden binnen 48 u, beschikbaar voor DE/AT/CH/US/PL. ② Eigen inkomend nummer (~20 €/maand, permanent) — huren in het seven.io dashboard.",
+	"headerSender": "Standaard afzender",
+	"defaultSender": "Standaard afzender-ID (optioneel)",
+	"defaultSenderHelp": "Max. 11 alfanumerieke of 16 numerieke tekens. Leeg = seven.io standaard. Alfanumerieke ID's (bijv. 'MijnBedrijf') kunnen geen directe antwoorden ontvangen — gebruik de gedeelde pool hieronder, of voer hier uw eigen gehuurd nummer (numeriek) in voor permanente inbound.",
+	"headerInbound": "Inkomende SMS & antwoorden",
+	"defaultGetReplies": "Antwoorden standaard inschakelen (gedeelde pool, gratis)",
+	"defaultGetRepliesHelp": "seven.io wijst tijdelijk een gedeeld poolnummer toe als afzender zodat ontvangers binnen 48 u kunnen antwoorden. Werkt ongeacht de afzender-ID hierboven. Geen eigen nummer vereist. Beschikbaar voor DE, AT, CH, US, PL. Binnen 2 weken probeert seven.io hetzelfde nummer te hergebruiken — zonder garantie.",
+	"inboundInterval": "Inbound polling interval (minuten, 0 = uit)",
+	"inboundIntervalHelp": "Hoe vaak inkomende SMS worden gecontroleerd. Werkt voor beide opties: antwoorden via gedeelde pool (als 'Antwoorden inschakelen' aan staat) en eigen gehuurd inbound nummer (~€20/maand). Op 0 zetten om polling uit te schakelen.",
+	"headerPricing": "Prijzen & statistieken",
 	"pricingCountry": "Landcode voor prijzen (bijv. DE, US)",
 	"pricingCountryHelp": "ISO-landcode om prijsgegevens te filteren. Leeg laten voor alle landen."
 }

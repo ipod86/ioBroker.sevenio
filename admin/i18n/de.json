@@ -1,13 +1,17 @@
 {
 	"sevenio adapter settings": "seven.io Adapter-Einstellungen",
+	"headerApi": "API-Verbindung",
 	"apiKey": "API-Schlüssel",
-	"defaultSender": "Standard-Absender-ID (optional)",
-	"defaultSenderHelp": "Max. 11 alphanumerische oder 16 numerische Zeichen. Leer = Kontovorgabe seven.io. Hinweis: Alphanumerische Absender (z. B. 'MeineFirma') können keine direkten SMS-Antworten empfangen. 'Antworten aktivieren' einschalten, um stattdessen eine Pool-Nummer als Absender zu verwenden — dann sind Antworten möglich, unabhängig von dieser Einstellung.",
-	"defaultGetReplies": "Antworten standardmäßig aktivieren (Shared Pool)",
-	"defaultGetRepliesHelp": "Wenn aktiviert, werden SMS über eine temporäre geteilte Rufnummer versandt, damit Empfänger antworten können. Antworten kommen innerhalb von 48 Stunden an. Innerhalb von 2 Wochen versucht seven.io, dieselbe Poolnummer zuzuteilen — ohne Garantie. Kostenlos, keine eigene Nummer nötig. Verfügbar für DE, AT, CH, US, PL.",
 	"balanceInterval": "Kontostand-Abfrageintervall (Minuten)",
-	"inboundInterval": "Eingehende SMS – Abfrageintervall (Minuten)",
-	"inboundIntervalHelp": "0 = deaktiviert. Zwei Optionen für Inbound-SMS: ① Shared Pool (kostenlos) — 'Antworten aktivieren' oben einschalten, keine eigene Nummer nötig, Antworten innerhalb 48 Std., verfügbar für DE/AT/CH/US/PL. ② Eigene Inbound-Nummer (~20 €/Monat, dauerhaft, zuverlässig) — im seven.io-Dashboard mieten.",
+	"headerSender": "Standard-Absender",
+	"defaultSender": "Standard-Absender-ID (optional)",
+	"defaultSenderHelp": "Max. 11 alphanumerische oder 16 numerische Zeichen. Leer = Kontovorgabe seven.io. Alphanumerische IDs (z. B. 'MeineFirma') können keine direkten Antworten empfangen — entweder unten den Shared-Pool aktivieren, oder hier eine eigene gemietete Rufnummer (numerisch) eintragen für dauerhaften Inbound.",
+	"headerInbound": "Eingehende SMS & Antworten",
+	"defaultGetReplies": "Antworten standardmäßig aktivieren (Shared Pool, kostenlos)",
+	"defaultGetRepliesHelp": "seven.io weist temporär eine Pool-Nummer als Absender zu, damit Empfänger innerhalb von 48 Std. antworten können. Funktioniert unabhängig von der Absender-ID oben. Keine eigene Nummer nötig. Verfügbar für DE, AT, CH, US, PL. Innerhalb von 2 Wochen versucht seven.io dieselbe Pool-Nummer zuzuweisen — ohne Garantie.",
+	"inboundInterval": "Inbound-Abfrageintervall (Minuten, 0 = aus)",
+	"inboundIntervalHelp": "Wie oft nach eingehenden SMS geprüft wird. Funktioniert für beide Optionen: Shared-Pool-Antworten (wenn 'Antworten aktivieren' eingeschaltet) und eigene gemietete Inbound-Nummer (~20 €/Monat). Auf 0 setzen um die Abfrage zu deaktivieren.",
+	"headerPricing": "Preise & Statistiken",
 	"pricingCountry": "Ländercode für Preisabfrage (z. B. DE, US)",
 	"pricingCountryHelp": "ISO-Ländercode zum Filtern der Preisdaten. Leer lassen für alle Länder."
 }

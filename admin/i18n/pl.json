@@ -1,13 +1,17 @@
 {
 	"sevenio adapter settings": "Ustawienia adaptera seven.io",
+	"headerApi": "Połączenie API",
 	"apiKey": "Klucz API",
-	"defaultSender": "Domyślny identyfikator nadawcy (opcjonalnie)",
-	"defaultSenderHelp": "Maks. 11 znaków alfanumerycznych lub 16 cyfr. Puste = domyślne seven.io. Uwaga: alfanumeryczni nadawcy (np. 'MojaFirma') nie mogą bezpośrednio odbierać odpowiedzi SMS. Włącz 'Włącz odpowiedzi' poniżej, aby używać wspólnego numeru puli jako nadawcy — odpowiedzi są wtedy możliwe niezależnie od tego ustawienia.",
-	"defaultGetReplies": "Włącz odpowiedzi domyślnie (pula wspólna)",
-	"defaultGetRepliesHelp": "Gdy włączone, SMS są wysyłane przez tymczasowy wspólny numer puli, aby odbiorcy mogli odpowiadać. Odpowiedzi docierają w ciągu 48 godzin. W ciągu 2 tygodni seven.io próbuje przypisać ten sam numer — bez gwarancji. Bezpłatnie, własny numer nie jest wymagany. Dostępne dla DE, AT, CH, US, PL.",
 	"balanceInterval": "Interwał odpytywania salda (minuty)",
-	"inboundInterval": "Interwał przychodzących SMS (minuty)",
-	"inboundIntervalHelp": "0 = wyłączone. Dwie opcje dla przychodzących SMS: ① Pula wspólna (bezpłatnie) — włączyć 'Włącz odpowiedzi' powyżej, własny numer nie jest wymagany, odpowiedzi w ciągu 48 godz., dostępne dla DE/AT/CH/US/PL. ② Własny numer przychodzący (~20 €/mies., stały) — wynajem w panelu seven.io.",
+	"headerSender": "Domyślny nadawca",
+	"defaultSender": "Domyślny ID nadawcy (opcjonalnie)",
+	"defaultSenderHelp": "Maks. 11 znaków alfanumerycznych lub 16 cyfr. Puste = domyślne seven.io. Alfanumeryczne ID (np. 'MojaFirma') nie mogą odbierać odpowiedzi bezpośrednio — użyj wspólnej puli poniżej lub wprowadź tutaj własny wynajęty numer (numeryczny) dla stałego inboundu.",
+	"headerInbound": "Przychodzące SMS i odpowiedzi",
+	"defaultGetReplies": "Włącz odpowiedzi domyślnie (pula wspólna, bezpłatnie)",
+	"defaultGetRepliesHelp": "seven.io tymczasowo przypisuje numer wspólnej puli jako nadawcę, aby odbiorcy mogli odpowiadać w ciągu 48 godz. Działa niezależnie od ID nadawcy powyżej. Własny numer nie jest wymagany. Dostępne dla DE, AT, CH, US, PL. W ciągu 2 tygodni seven.io próbuje ponownie użyć tego samego numeru — bez gwarancji.",
+	"inboundInterval": "Interwał polling przychodzących (minuty, 0 = wył.)",
+	"inboundIntervalHelp": "Jak często sprawdzać przychodzące SMS. Działa dla obu opcji: odpowiedzi przez wspólną pulę (gdy 'Włącz odpowiedzi' jest włączone) i własny wynajęty numer inbound (~20 €/mies.). Ustaw 0, aby wyłączyć.",
+	"headerPricing": "Ceny & statystyki",
 	"pricingCountry": "Kod kraju dla cen (np. DE, US)",
 	"pricingCountryHelp": "Kod ISO kraju do filtrowania danych cenowych. Pozostaw puste dla wszystkich krajów."
 }

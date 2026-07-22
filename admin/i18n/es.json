@@ -1,13 +1,17 @@
 {
 	"sevenio adapter settings": "Configuración del adaptador seven.io",
+	"headerApi": "Conexión API",
 	"apiKey": "Clave API",
-	"defaultSender": "ID de remitente predeterminado (opcional)",
-	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos o 16 numéricos. Vacío = predeterminado seven.io. Nota: los remitentes alfanuméricos (ej. 'MiEmpresa') no pueden recibir directamente respuestas SMS. Activa 'Habilitar respuestas' a continuación para usar un número de pool compartido como remitente — las respuestas son entonces posibles independientemente de este ajuste.",
-	"defaultGetReplies": "Habilitar respuestas por defecto (pool compartido)",
-	"defaultGetRepliesHelp": "Si está habilitado, los SMS se envían mediante un número de pool temporal compartido para que los destinatarios puedan responder. Las respuestas llegan en 48 horas. En 2 semanas seven.io intenta asignar el mismo número — sin garantía. Gratuito, sin número propio necesario. Disponible para DE, AT, CH, US, PL.",
 	"balanceInterval": "Intervalo de consulta de saldo (minutos)",
-	"inboundInterval": "Intervalo de SMS entrantes (minutos)",
-	"inboundIntervalHelp": "0 = desactivado. Dos opciones para SMS entrantes: ① Pool compartido (gratuito) — activar 'Habilitar respuestas' arriba, sin número propio, respuestas en 48 h, disponible para DE/AT/CH/US/PL. ② Número entrante propio (~20 €/mes, permanente) — alquilar en el panel de seven.io.",
+	"headerSender": "Remitente predeterminado",
+	"defaultSender": "ID de remitente predeterminado (opcional)",
+	"defaultSenderHelp": "Máx. 11 caracteres alfanuméricos o 16 numéricos. Vacío = predeterminado seven.io. Los ID alfanuméricos (ej. 'MiEmpresa') no pueden recibir respuestas directamente — usa el pool compartido abajo, o introduce aquí tu propio número alquilado (numérico) para inbound permanente.",
+	"headerInbound": "SMS entrantes & respuestas",
+	"defaultGetReplies": "Habilitar respuestas por defecto (pool compartido, gratuito)",
+	"defaultGetRepliesHelp": "seven.io asigna temporalmente un número de pool compartido como remitente para que los destinatarios puedan responder en 48 h. Funciona independientemente del ID de remitente arriba. Sin número propio necesario. Disponible para DE, AT, CH, US, PL. En 2 semanas seven.io intenta reutilizar el mismo número — sin garantía.",
+	"inboundInterval": "Intervalo de polling entrante (minutos, 0 = desact.)",
+	"inboundIntervalHelp": "Con qué frecuencia buscar SMS entrantes. Funciona para ambas opciones: respuestas via pool compartido (si 'Habilitar respuestas' está activado) y número entrante propio alquilado (~20 €/mes). Poner 0 para desactivar.",
+	"headerPricing": "Precios & estadísticas",
 	"pricingCountry": "Código de país para precios (ej. DE, US)",
 	"pricingCountryHelp": "Código ISO del país para filtrar datos de precios. Dejar vacío para todos los países."
 }
