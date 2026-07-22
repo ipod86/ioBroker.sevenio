@@ -79,16 +79,27 @@ const SMS_STATUS: Record<string, string> = {
 };
 
 function smsStatusText(result: unknown): string {
-	let code: string;
 	if (typeof result === 'number' || typeof result === 'string') {
-		code = String(result);
-	} else if (typeof result === 'object' && result !== null) {
-		const raw = (result as Record<string, unknown>).success;
-		code = typeof raw === 'string' || typeof raw === 'number' ? String(raw) : '';
-	} else {
-		return 'Unknown status';
+		return SMS_STATUS[String(result)] ?? `Unknown status ${result}`;
 	}
-	return SMS_STATUS[code] ?? `Unknown status ${code}`;
+	if (typeof result === 'object' && result !== null) {
+		const r = result as Record<string, unknown>;
+		// json=1 response: check individual message errors first
+		if (Array.isArray(r.messages) && r.messages.length > 0) {
+			const msgs = r.messages as Array<Record<string, unknown>>;
+			const failed = msgs.filter(m => m.success !== true);
+			if (failed.length > 0) {
+				const errVal = failed[0].error;
+				const code = typeof errVal === 'string' || typeof errVal === 'number' ? String(errVal) : '';
+				return SMS_STATUS[code] ?? `Unknown status ${code}`;
+			}
+			return SMS_STATUS['100'] ?? 'Success';
+		}
+		const raw = r.success;
+		const code = typeof raw === 'string' || typeof raw === 'number' ? String(raw) : '';
+		return SMS_STATUS[code] ?? `Unknown status ${code}`;
+	}
+	return 'Unknown status';
 }
 
 const VOICE_STATUS: Record<string, string> = {
@@ -111,8 +122,12 @@ function smsIsSuccess(result: unknown): boolean {
 		return String(result) === '100';
 	}
 	if (typeof result === 'object' && result !== null) {
-		const raw = (result as Record<string, unknown>).success;
-		return String(raw) === '100';
+		const r = result as Record<string, unknown>;
+		// json=1 response: check all individual messages
+		if (Array.isArray(r.messages) && r.messages.length > 0) {
+			return (r.messages as Array<Record<string, unknown>>).every(m => m.success === true);
+		}
+		return String(r.success) === '100';
 	}
 	return false;
 }
@@ -268,6 +283,10 @@ class Sevenio extends utils.Adapter {
 						}
 						await this.setState('sms.lastResult', { val: JSON.stringify(enriched), ack: true });
 						await this.setState('sms.lastStatus', { val: status, ack: true });
+						if (typeof enriched.balance === 'number') {
+							await this.setState('account.balance', { val: enriched.balance, ack: true });
+							await this.setState('account.lastCheck', { val: new Date().toISOString(), ack: true });
+						}
 						this.scheduleDeliveryCheck(this.extractMessageIds(enriched));
 						respond(enriched);
 					})
@@ -852,6 +871,10 @@ class Sevenio extends utils.Adapter {
 			}
 			await this.setState('sms.lastResult', { val: JSON.stringify(result), ack: true });
 			await this.setState('sms.lastStatus', { val: status, ack: true });
+			if (typeof result.balance === 'number') {
+				await this.setState('account.balance', { val: result.balance, ack: true });
+				await this.setState('account.lastCheck', { val: new Date().toISOString(), ack: true });
+			}
 			this.scheduleDeliveryCheck(this.extractMessageIds(result));
 		} catch (e) {
 			this.log.error(`SMS send failed: ${(e as Error).message}`);
@@ -904,6 +927,7 @@ class Sevenio extends utils.Adapter {
 			to: opts.to,
 			text: opts.text,
 			from: opts.from || this.cfg.defaultSender || '',
+			json: '1',
 		};
 		if (opts.flash) {
 			body.flash = '1';

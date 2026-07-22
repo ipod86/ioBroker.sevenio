@@ -40,17 +40,27 @@ const SMS_STATUS = {
   902: "Parameter value too long"
 };
 function smsStatusText(result) {
-  var _a;
-  let code;
+  var _a, _b, _c, _d;
   if (typeof result === "number" || typeof result === "string") {
-    code = String(result);
-  } else if (typeof result === "object" && result !== null) {
-    const raw = result.success;
-    code = typeof raw === "string" || typeof raw === "number" ? String(raw) : "";
-  } else {
-    return "Unknown status";
+    return (_a = SMS_STATUS[String(result)]) != null ? _a : `Unknown status ${result}`;
   }
-  return (_a = SMS_STATUS[code]) != null ? _a : `Unknown status ${code}`;
+  if (typeof result === "object" && result !== null) {
+    const r = result;
+    if (Array.isArray(r.messages) && r.messages.length > 0) {
+      const msgs = r.messages;
+      const failed = msgs.filter((m) => m.success !== true);
+      if (failed.length > 0) {
+        const errVal = failed[0].error;
+        const code2 = typeof errVal === "string" || typeof errVal === "number" ? String(errVal) : "";
+        return (_b = SMS_STATUS[code2]) != null ? _b : `Unknown status ${code2}`;
+      }
+      return (_c = SMS_STATUS["100"]) != null ? _c : "Success";
+    }
+    const raw = r.success;
+    const code = typeof raw === "string" || typeof raw === "number" ? String(raw) : "";
+    return (_d = SMS_STATUS[code]) != null ? _d : `Unknown status ${code}`;
+  }
+  return "Unknown status";
 }
 const VOICE_STATUS = {
   100: "Success",
@@ -70,8 +80,11 @@ function smsIsSuccess(result) {
     return String(result) === "100";
   }
   if (typeof result === "object" && result !== null) {
-    const raw = result.success;
-    return String(raw) === "100";
+    const r = result;
+    if (Array.isArray(r.messages) && r.messages.length > 0) {
+      return r.messages.every((m) => m.success === true);
+    }
+    return String(r.success) === "100";
   }
   return false;
 }
@@ -194,6 +207,10 @@ class Sevenio extends utils.Adapter {
           }
           await this.setState("sms.lastResult", { val: JSON.stringify(enriched), ack: true });
           await this.setState("sms.lastStatus", { val: status, ack: true });
+          if (typeof enriched.balance === "number") {
+            await this.setState("account.balance", { val: enriched.balance, ack: true });
+            await this.setState("account.lastCheck", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
+          }
           this.scheduleDeliveryCheck(this.extractMessageIds(enriched));
           respond(enriched);
         }).catch((e) => respond({ error: e.message }));
@@ -720,6 +737,10 @@ class Sevenio extends utils.Adapter {
       }
       await this.setState("sms.lastResult", { val: JSON.stringify(result), ack: true });
       await this.setState("sms.lastStatus", { val: status, ack: true });
+      if (typeof result.balance === "number") {
+        await this.setState("account.balance", { val: result.balance, ack: true });
+        await this.setState("account.lastCheck", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
+      }
       this.scheduleDeliveryCheck(this.extractMessageIds(result));
     } catch (e) {
       this.log.error(`SMS send failed: ${e.message}`);
@@ -770,7 +791,8 @@ class Sevenio extends utils.Adapter {
     const body = {
       to: opts.to,
       text: opts.text,
-      from: opts.from || this.cfg.defaultSender || ""
+      from: opts.from || this.cfg.defaultSender || "",
+      json: "1"
     };
     if (opts.flash) {
       body.flash = "1";
