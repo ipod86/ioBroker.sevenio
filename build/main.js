@@ -171,7 +171,7 @@ class Sevenio extends utils.Adapter {
     }
   }
   onMessage(obj) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     if (!obj || typeof obj !== "object") {
       return;
     }
@@ -186,7 +186,7 @@ class Sevenio extends utils.Adapter {
         const smsOpts = {
           ...msg,
           to: this.resolveRecipient(msg.to),
-          getReplies: (_b = (_a = msg.getReplies) != null ? _a : this.cfg.defaultGetReplies) != null ? _b : false
+          getReplies: (_a = msg.getReplies) != null ? _a : false
         };
         void this.sendSms(smsOpts).then(async (result) => {
           var _a2, _b2, _c2;
@@ -254,14 +254,14 @@ class Sevenio extends utils.Adapter {
       }
       case "test_sms": {
         const tmsg = obj.message;
-        void this.sendSms({ to: tmsg.to, text: (_c = tmsg.text) != null ? _c : "seven.io adapter test" }).then((result) => respond(enrichSmsResult(result))).catch((e) => respond({ error: e.message }));
+        void this.sendSms({ to: tmsg.to, text: (_b = tmsg.text) != null ? _b : "seven.io adapter test" }).then((result) => respond(enrichSmsResult(result))).catch((e) => respond({ error: e.message }));
         break;
       }
       case "test_voice": {
         const tvmsg = obj.message;
         void this.sendVoice({
           to: tvmsg.to,
-          text: (_d = tvmsg.text) != null ? _d : "This is a test call from the seven.io ioBroker adapter."
+          text: (_c = tvmsg.text) != null ? _c : "This is a test call from the seven.io ioBroker adapter."
         }).then(respond).catch((e) => respond({ error: e.message }));
         break;
       }
@@ -408,6 +408,18 @@ class Sevenio extends utils.Adapter {
       [
         "pricing.lastUpdate",
         { name: "Last pricing update", type: "string", role: "date", read: true, write: false, def: "" }
+      ],
+      [
+        "pricing.price",
+        {
+          name: "SMS price for configured country",
+          type: "number",
+          role: "value",
+          unit: "\u20AC",
+          read: true,
+          write: false,
+          def: 0
+        }
       ],
       [
         "pricing.refresh",
@@ -707,7 +719,7 @@ class Sevenio extends utils.Adapter {
     }, 6e4);
   }
   async triggerSms() {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e;
     await this.setState("sms.send", { val: false, ack: true });
     const [to, text, from, flash, getReplies] = await Promise.all([
       this.getStateAsync("sms.to"),
@@ -721,7 +733,7 @@ class Sevenio extends utils.Adapter {
       text: String((_b = text == null ? void 0 : text.val) != null ? _b : ""),
       from: String((_c = from == null ? void 0 : from.val) != null ? _c : ""),
       flash: Boolean((_d = flash == null ? void 0 : flash.val) != null ? _d : false),
-      getReplies: Boolean((_f = (_e = getReplies == null ? void 0 : getReplies.val) != null ? _e : this.cfg.defaultGetReplies) != null ? _f : false)
+      getReplies: Boolean((_e = getReplies == null ? void 0 : getReplies.val) != null ? _e : false)
     };
     if (!opts.to || !opts.text) {
       this.log.warn('SMS send triggered but "to" or "text" is empty');
@@ -830,6 +842,7 @@ class Sevenio extends utils.Adapter {
     };
   }
   async fetchPricing() {
+    var _a, _b, _c, _d, _e;
     try {
       const params = {};
       if (this.cfg.pricingCountry) {
@@ -838,7 +851,9 @@ class Sevenio extends utils.Adapter {
       const res = await this.apiGet("/pricing", Object.keys(params).length ? params : void 0);
       await this.setState("pricing.json", { val: JSON.stringify(res), ack: true });
       await this.setState("pricing.lastUpdate", { val: (/* @__PURE__ */ new Date()).toISOString(), ack: true });
-      this.log.debug("Pricing data fetched");
+      const price = (_e = (_d = (_c = (_b = (_a = res.countries) == null ? void 0 : _a[0]) == null ? void 0 : _b.networks) == null ? void 0 : _c[0]) == null ? void 0 : _d.price) != null ? _e : 0;
+      await this.setState("pricing.price", { val: price, ack: true });
+      this.log.debug(`Pricing data fetched${price ? ` \u2014 ${price} \u20AC/SMS` : ""}`);
     } catch (e) {
       this.log.warn(`Pricing fetch failed: ${e.message}`);
     }
