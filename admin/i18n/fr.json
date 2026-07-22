@@ -3,18 +3,14 @@
 	"headerApi": "Connexion API",
 	"apiKey": "Clé API",
 	"balanceInterval": "Intervalle de vérification du solde (minutes)",
-	"headerSender": "Expéditeur par défaut",
 	"defaultSender": "ID expéditeur par défaut (facultatif)",
 	"defaultSenderHelp": "Max. 11 caractères alphanumériques ou 16 numériques. Vide = valeur par défaut seven.io. Les ID alphanumériques (ex. 'MaSociété') ne peuvent pas recevoir de réponses directement — utilisez le pool partagé ci-dessous ou entrez votre propre numéro loué (numérique) ici pour un inbound permanent.",
 	"headerInbound": "SMS entrants & réponses",
-	"defaultGetReplies": "Réponses via pool partagé (gratuit, sans numéro propre)",
 	"inboundInterval": "Intervalle de vérification entrant (minutes, 0 = désact.)",
 	"inboundIntervalHelp": "Fréquence de vérification des SMS entrants. 0 = désactivé. Récupère les réponses aux SMS en pool partagé (opt-in par message via Blockly ou getReplies dans sendTo) et les SMS sur votre propre numéro.",
 	"headerPricing": "Tarifs & statistiques",
 	"pricingCountry": "Code pays pour les tarifs (ex. DE, US)",
 	"pricingCountryHelp": "Code ISO du pays pour filtrer les données tarifaires. Laisser vide pour tous les pays.",
-	"defaultGetRepliesInfo": "ℹ️ seven.io attribue temporairement un numéro de pool partagé comme expéditeur — les destinataires peuvent répondre dans les 48 h. Disponible pour DE, AT, CH, US, PL. Dans les 2 semaines, seven.io tente de réutiliser le même numéro — sans garantie.",
-	"headerSharedPool": "Option 1 — Pool partagé (gratuit, sans numéro propre)",
 	"headerOwnNumber": "Numéro entrant propre (~20 €/mois)",
 	"ownNumberInfo": "Saisissez le numéro loué dans 'ID expéditeur par défaut'. Les SMS envoyés depuis ce numéro peuvent toujours recevoir des réponses — sans pool partagé."
 }

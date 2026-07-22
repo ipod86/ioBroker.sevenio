@@ -990,11 +990,9 @@ class Sevenio extends utils.Adapter {
 			};
 			await this.setState('pricing.json', { val: JSON.stringify(res), ack: true });
 			await this.setState('pricing.lastUpdate', { val: new Date().toISOString(), ack: true });
-			if (this.cfg.pricingCountry) {
-				const price = res.countries?.[0]?.networks?.[0]?.price ?? 0;
-				await this.setState('pricing.price', { val: price, ack: true });
-			}
-			this.log.debug('Pricing data fetched');
+			const price = res.countries?.[0]?.networks?.[0]?.price ?? 0;
+			await this.setState('pricing.price', { val: price, ack: true });
+			this.log.debug(`Pricing data fetched${price ? ` — ${price} €/SMS` : ''}`);
 		} catch (e) {
 			this.log.warn(`Pricing fetch failed: ${(e as Error).message}`);
 		}
