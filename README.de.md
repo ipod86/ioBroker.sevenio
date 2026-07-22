@@ -119,7 +119,10 @@ Dieser Adapter verbindet ioBroker mit der [seven.io](https://www.seven.io) SMS- 
 | `pricing.lastUpdate` | string | ISO-Zeitstempel der letzten Preisabfrage |
 | `pricing.refresh` | boolean | Auf `true` setzen → Preisdaten sofort aktualisieren |
 
-### `stats` *(letzte 30 Tage)*
+### `stats` *(rollierendes 30-Tage-Fenster)*
+
+Die Statistiken beziehen sich immer auf den rollierenden Zeitraum **heute − 30 Tage → heute**. Sie werden einmalig beim Adapterstart und bei manueller Auslösung abgerufen — es gibt keinen automatischen Aktualisierungs-Timer.
+
 | Datenpunkt | Typ | Beschreibung |
 |---|---|---|
 | `stats.smsSent` | number | Gesendete SMS (letzte 30 Tage) |

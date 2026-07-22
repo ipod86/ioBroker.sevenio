@@ -119,7 +119,10 @@ This adapter connects ioBroker to the [seven.io](https://www.seven.io) SMS and c
 | `pricing.lastUpdate` | string | ISO timestamp of the last pricing fetch |
 | `pricing.refresh` | boolean | Set to `true` to refresh pricing data immediately |
 
-### `stats` *(last 30 days)*
+### `stats` *(rolling 30 days)*
+
+Statistics always cover the rolling window **today − 30 days → today**. They are fetched once on adapter start and on manual trigger — there is no automatic refresh timer.
+
 | State | Type | Description |
 |---|---|---|
 | `stats.smsSent` | number | Total outbound SMS sent in the last 30 days |
