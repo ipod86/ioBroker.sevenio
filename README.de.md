@@ -276,8 +276,15 @@ Der Datenpunkt `sms.lastStatus` enthält eine lesbare Übersetzung des seven.io-
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
-* (ipod86) Erstveröffentlichung
+### 0.1.0 (2026-07-22)
+* (ipod86) SMS versenden via Datenpunkt, Blockly und sendTo()
+* (ipod86) Sprachanrufe (TTS) via Datenpunkt, Blockly und sendTo()
+* (ipod86) Kontaktverwaltung — Sync, Anlegen, Versand per Name
+* (ipod86) Inbound-SMS-Polling mit Shared-Pool- und eigener Nummer
+* (ipod86) Zustellstatus ~60 s nach dem Versand
+* (ipod86) Kontostand-Polling
+* (ipod86) SMS-Preisdaten mit eigenem Preis-Datenpunkt pro Land
+* (ipod86) Nutzungsstatistiken (rollierendes 30-Tage-Fenster)
 
 ---
 

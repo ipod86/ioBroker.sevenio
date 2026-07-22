@@ -1,6 +1,6 @@
 {
   "name": "iobroker.sevenio",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "ioBroker adapter for the seven.io API. Send SMS, perform phone number lookups, manage contacts and groups, use voice services and monitor account information.",
   "author": {
     "name": "ipod86",

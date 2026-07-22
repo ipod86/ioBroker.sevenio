@@ -276,8 +276,15 @@ The `sms.lastStatus` state contains a human-readable translation of the seven.io
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
-* (ipod86) initial release
+### 0.1.0 (2026-07-22)
+* (ipod86) SMS sending via state, Blockly, and sendTo()
+* (ipod86) Voice calls (TTS) via state, Blockly, and sendTo()
+* (ipod86) Contact management — sync, create, send by name
+* (ipod86) Inbound SMS polling with shared pool and own number support
+* (ipod86) Delivery status check ~60 s after sending
+* (ipod86) Account balance polling
+* (ipod86) SMS pricing data with per-country price state
+* (ipod86) Usage statistics (rolling 30-day window)
 
 ---
 

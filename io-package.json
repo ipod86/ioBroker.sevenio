@@ -1,8 +1,21 @@
 {
 	"common": {
 		"name": "sevenio",
-		"version": "0.0.1",
+		"version": "0.1.0",
 		"news": {
+			"0.1.0": {
+				"en": "SMS, voice calls, contacts, inbound polling, delivery status, pricing, statistics",
+				"de": "SMS, Sprachanrufe, Kontakte, Inbound-Polling, Zustellstatus, Preise, Statistiken",
+				"ru": "SMS, голосовые звонки, контакты, опрос входящих, статус доставки, цены, статистика",
+				"pt": "SMS, chamadas de voz, contatos, polling de entrada, status de entrega, preços, estatísticas",
+				"nl": "SMS, gesprekken, contacten, inbound polling, bezorgstatus, prijzen, statistieken",
+				"fr": "SMS, appels vocaux, contacts, polling entrant, statut de livraison, tarifs, statistiques",
+				"it": "SMS, chiamate vocali, contatti, polling in entrata, stato di consegna, prezzi, statistiche",
+				"es": "SMS, llamadas de voz, contactos, polling de entrada, estado de entrega, precios, estadísticas",
+				"pl": "SMS, połączenia głosowe, kontakty, polling przychodzący, status dostarczenia, ceny, statystyki",
+				"uk": "SMS, голосові дзвінки, контакти, опитування вхідних, статус доставки, ціни, статистика",
+				"zh-cn": "短信、语音通话、联系人、接收轮询、投递状态、价格、统计"
+			},
 			"0.0.1": {
 				"en": "initial release",
 				"de": "Erstveröffentlichung",
@@ -43,8 +56,21 @@
 			"uk": "Адаптер ioBroker для API seven.io. Надсилайте SMS, виконуйте пошук номерів телефонів, керуйте контактами та групами, користуйтеся голосовими службами та контролюйте інформацію про обліковий запис.",
 			"zh-cn": "ioBroker 是 seven.io API 的适配器。可发送短信、查询电话号码、管理联系人和群组、使用语音服务以及监控帐户信息。"
 		},
-		"authors": ["ipod86 <david@graef.email>"],
-		"keywords": ["seven.io", "sms", "messaging", "voice", "hlr", "mnp", "cnam", "lookup", "communication", "api"],
+		"authors": [
+			"ipod86 <david@graef.email>"
+		],
+		"keywords": [
+			"seven.io",
+			"sms",
+			"messaging",
+			"voice",
+			"hlr",
+			"mnp",
+			"cnam",
+			"lookup",
+			"communication",
+			"api"
+		],
 		"licenseInformation": {
 			"type": "free",
 			"license": "MIT"
@@ -84,8 +110,12 @@
 		"inboundInterval": 0,
 		"pricingCountry": ""
 	},
-	"protectedNative": ["apiKey"],
-	"encryptedNative": ["apiKey"],
+	"protectedNative": [
+		"apiKey"
+	],
+	"encryptedNative": [
+		"apiKey"
+	],
 	"objects": [],
 	"instanceObjects": [
 		{
