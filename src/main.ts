@@ -352,6 +352,12 @@ class Sevenio extends utils.Adapter {
 					.catch((e: Error) => respond({ error: e.message }));
 				break;
 			}
+			case 'get_stats': {
+				void this.fetchStats()
+					.then(respond)
+					.catch((e: Error) => respond({ error: e.message }));
+				break;
+			}
 			default:
 				respond({ error: `Unknown command: ${obj.command}` });
 		}

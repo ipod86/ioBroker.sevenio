@@ -253,6 +253,28 @@ sendTo('sevenio.0', 'test_voice', { to: '+491234567890' }, result => {
 });
 ```
 
+**Refresh statistics immediately:**
+```javascript
+sendTo('sevenio.0', 'get_stats', {}, result => {
+    console.log(result); // raw analytics data
+});
+```
+
+Alternatively, set the `sevenio.0.stats.refresh` data point to `true` — the adapter fetches fresh statistics and resets the state to `false` automatically.
+
+**Delayed SMS (scheduled delivery):**
+```javascript
+sendTo('sevenio.0', 'send', {
+    to: '+491234567890',
+    text: 'Good morning!',
+    delay: '2026-12-24 08:00:00', // ISO datetime or Unix timestamp (seconds)
+}, result => {
+    console.log(result.statusText);
+});
+```
+
+The `delay` parameter is forwarded directly to the seven.io API. Use an ISO datetime string (`YYYY-MM-DD HH:MM:SS`) or a Unix timestamp in seconds. The message is queued by seven.io and delivered at the specified time.
+
 ---
 
 ## SMS status codes
