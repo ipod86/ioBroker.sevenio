@@ -300,7 +300,7 @@ Der Datenpunkt `sms.lastStatus` enthält eine lesbare Übersetzung des seven.io-
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.1.3 (2026-10-21)
 * (ipod86) Neu: `sendTo`-Befehl `get_stats` aktualisiert die Statistiken sofort; Doku zu `stats.refresh` und zum `delay`-Parameter (zeitversetzter SMS-Versand)
 * (ipod86) Wartung: Entwicklungsabhängigkeiten aktualisiert, Tests auf Node.js 22/24/26, Auto-Merge für Dependabot
 
