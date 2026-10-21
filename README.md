@@ -300,6 +300,10 @@ The `sms.lastStatus` state contains a human-readable translation of the seven.io
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+* (ipod86) New: `sendTo` command `get_stats` refreshes the statistics immediately; documentation of `stats.refresh` and the `delay` parameter (scheduled SMS delivery)
+* (ipod86) Maintenance: updated dev dependencies, tests on Node.js 22/24/26, auto-merge for Dependabot
+
 ### 0.1.2 (2026-07-22)
 * (ipod86) Maintenance: fix io-package.json structure, improve CI and dependabot configuration
 

@@ -253,6 +253,28 @@ sendTo('sevenio.0', 'test_voice', { to: '+491234567890' }, result => {
 });
 ```
 
+**Statistiken sofort aktualisieren:**
+```javascript
+sendTo('sevenio.0', 'get_stats', {}, result => {
+    console.log(result); // Rohdaten der Statistik
+});
+```
+
+Alternativ den Datenpunkt `sevenio.0.stats.refresh` auf `true` setzen – der Adapter holt neue Statistiken und setzt den Wert danach automatisch auf `false` zurück.
+
+**Zeitversetzte SMS (geplanter Versand):**
+```javascript
+sendTo('sevenio.0', 'send', {
+    to: '+491234567890',
+    text: 'Guten Morgen!',
+    delay: '2026-12-24 08:00:00', // ISO-Datum/Uhrzeit oder Unix-Zeitstempel (Sekunden)
+}, result => {
+    console.log(result.statusText);
+});
+```
+
+Der Parameter `delay` wird unverändert an die seven.io-API weitergegeben. Möglich sind ein ISO-Datum (`JJJJ-MM-TT HH:MM:SS`) oder ein Unix-Zeitstempel in Sekunden. seven.io stellt die Nachricht zum angegebenen Zeitpunkt zu.
+
 ---
 
 ## SMS-Statuscodes
@@ -277,6 +299,10 @@ Der Datenpunkt `sms.lastStatus` enthält eine lesbare Übersetzung des seven.io-
     Platzhalter für die nächste Version (am Zeilenanfang):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+* (ipod86) Neu: `sendTo`-Befehl `get_stats` aktualisiert die Statistiken sofort; Doku zu `stats.refresh` und zum `delay`-Parameter (zeitversetzter SMS-Versand)
+* (ipod86) Wartung: Entwicklungsabhängigkeiten aktualisiert, Tests auf Node.js 22/24/26, Auto-Merge für Dependabot
 
 ### 0.1.2 (2026-07-22)
 * (ipod86) Wartung: io-package.json-Struktur korrigiert, CI- und Dependabot-Konfiguration verbessert
